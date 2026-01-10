@@ -16,8 +16,12 @@ os.makedirs(DATASET_DIR, exist_ok=True)
 
 @app.route("/predict", methods=["POST"])
 def predict_gesture():
+    print("hiiii")
     data = request.get_json()
+    print("RAW DATA:", data)
     landmarks = data.get("landmarks")
+    print("Incoming landmarks length:", len(landmarks) if landmarks else None)
+    print("Incoming landmarks sample:", landmarks[:6] if landmarks else None)
 
     if not landmarks or len(landmarks) != 63:
         return jsonify({"error": "Invalid landmarks"}), 400
@@ -42,7 +46,6 @@ def health():
 
 @app.route("/landmarks", methods=["POST"])
 def receive_landmarks():
-    print("hi")
     data = request.get_json()
 
     if not data:

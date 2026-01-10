@@ -24,7 +24,7 @@ function ISLPredictor() {
   /* ---------- send landmarks for prediction ---------- */
   const sendForPrediction = useCallback(async (landmarks) => {
     try {
-      const res = await axios.post("/api/ml/predict", { landmarks });
+      const res = await axios.post("http://localhost:5001/predict", { landmarks: landmarks });
       setPrediction(res.data.prediction);
       setConfidence(res.data.confidence);
       setStatus("Prediction successful");

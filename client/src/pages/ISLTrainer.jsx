@@ -197,7 +197,7 @@ function ISLTrainer() {
           <option value="">-- Select Gesture --</option>
           <option value="THANKS">THANKS</option>
           <option value="SORRY">SORRY</option>
-          <option value="ILOVEYOU">ILOVEYOU</option>
+          <option value="IAMFINE">IAMFINE</option>
         </select>
       </div>
 

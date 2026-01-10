@@ -27,6 +27,7 @@ for file in os.listdir(DATASET_DIR):
 
 X = np.array(X)
 y = np.array(y)
+print("Training sample:", X[0][:6])
 
 print("Samples:", X.shape)
 print("Labels:", set(y))
