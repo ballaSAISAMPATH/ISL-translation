@@ -14,6 +14,25 @@ model = joblib.load(MODEL_PATH)
 DATASET_DIR = "dataset"
 os.makedirs(DATASET_DIR, exist_ok=True)
 
+@app.route("/predict", methods=["POST"])
+def predict_gesture():
+    data = request.get_json()
+    landmarks = data.get("landmarks")
+
+    if not landmarks or len(landmarks) != 63:
+        return jsonify({"error": "Invalid landmarks"}), 400
+
+    X = np.array(landmarks).reshape(1, -1)
+
+    prediction = model.predict(X)[0]
+    confidence = max(model.predict_proba(X)[0])
+
+    return jsonify({
+        "prediction": prediction,
+        "confidence": float(confidence)
+    })
+
+
 @app.route("/", methods=["GET"])
 def health():
     return jsonify({
