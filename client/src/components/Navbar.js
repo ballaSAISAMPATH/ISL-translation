@@ -42,6 +42,11 @@ function Navbar() {
             </Link>
           </li>
           <li className="nav-item">
+            <Link to="/predict" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+              <FaHome /> <span>predict</span>
+            </Link>
+          </li>
+          <li className="nav-item">
             <Link to="/translation" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
               <FaLanguage /> <span>Translation</span>
             </Link>

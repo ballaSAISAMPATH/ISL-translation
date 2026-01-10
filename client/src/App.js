@@ -22,6 +22,7 @@ import Profile from './pages/Profile';
 // Context
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ISLTrainer from './pages/ISLTrainer';
+import ISLPredictor from './pages/ISLPredictor';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -42,6 +43,7 @@ function AppContent() {
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/translation" element={<ProtectedRoute><Translation /></ProtectedRoute>} />
           <Route path="/train" element={<ProtectedRoute><ISLTrainer /></ProtectedRoute>} />
+          <Route path="/predict" element={<ProtectedRoute><ISLPredictor /></ProtectedRoute>} />
           <Route path="/learning" element={<ProtectedRoute><Learning /></ProtectedRoute>} />
           <Route path="/isl-to-text" element={<ProtectedRoute><ISLToText /></ProtectedRoute>} />
           <Route path="/text-to-isl" element={<ProtectedRoute><TextToISL /></ProtectedRoute>} />
