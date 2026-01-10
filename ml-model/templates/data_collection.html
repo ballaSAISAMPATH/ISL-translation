@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISL Data Collection - Real Training Data</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .session-setup {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .collection-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .camera-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 300px;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-feed video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-feed canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .gesture-controls {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .gesture-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .gesture-btn {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .gesture-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .gesture-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .gesture-btn.collected {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .progress-section {
+            background: #e8f5e8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e1e5e9;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .collection-interface {
+                grid-template-columns: 1fr;
+            }
+            
+            .demographics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤟 ISL Data Collection</h1>
+            <p>Help us build authentic Indian Sign Language recognition</p>
+        </div>
+
+        <div class="content">
+            <!-- Session Setup -->
+            <div id="session-setup" class="session-setup">
+                <h2>📝 Signer Information</h2>
+                <p>Please provide your information to help us collect diverse, authentic ISL data:</p>
+                
+                <div class="demographics-grid">
+                    <div class="form-group">
+                        <label for="signer-id">Signer ID *</label>
+                        <input type="text" id="signer-id" placeholder="e.g., signer_001" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="age">Age Range</label>
+                        <select id="age">
+                            <option value="18-25">18-25</option>
+                            <option value="26-35">26-35</option>
+                            <option value="36-45">36-45</option>
+                            <option value="46-55">46-55</option>
+                            <option value="55+">55+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signing-experience">Signing Experience</label>
+                        <select id="signing-experience">
+                            <option value="native">Native Signer</option>
+                            <option value="fluent">Fluent</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="beginner">Beginner</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hearing-status">Hearing Status</label>
+                        <select id="hearing-status">
+                            <option value="deaf">Deaf</option>
+                            <option value="hard-of-hearing">Hard of Hearing</option>
+                            <option value="hearing">Hearing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="region">Region</label>
+                        <input type="text" id="region" placeholder="e.g., Delhi, Mumbai, Bangalore" value="India">
+                    </div>
+                </div>
+                
+                <button id="start-session-btn" class="btn">🚀 Start Collection Session</button>
+            </div>
+
+            <!-- Collection Interface -->
+            <div id="collection-interface" class="collection-interface hidden">
+                <div class="camera-section">
+                    <h3>📹 Camera Feed</h3>
+                    <div class="camera-feed" id="camera-feed">
+                        <video id="video" autoplay muted></video>
+                        <canvas id="canvas"></canvas>
+                    </div>
+                    <button id="start-camera-btn" class="btn">📷 Start Camera</button>
+                    <button id="capture-btn" class="btn" disabled>📸 Capture Gesture</button>
+                </div>
+
+                <div class="gesture-controls">
+                    <h3>🎯 Select Gesture to Record</h3>
+                    <div class="gesture-grid" id="gesture-grid">
+                        <!-- Gestures will be populated by JavaScript -->
+                    </div>
+                    
+                    <div id="current-gesture-info">
+                        <h4>Current Gesture: <span id="current-gesture-name">None</span></h4>
+                        <p id="gesture-description">Select a gesture to start recording</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Section -->
+            <div id="progress-section" class="progress-section hidden">
+                <h3>📊 Collection Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+                <p>Progress: <span id="progress-text">0%</span></p>
+                <p>Collected: <span id="collected-count">0</span> / <span id="total-count">0</span> gestures</p>
+            </div>
+
+            <!-- Status Messages -->
+            <div id="status-messages"></div>
+        </div>
+    </div>
+
+    <script>
+        class ISLDataCollector {
+            constructor() {
+                this.currentSigner = null;
+                this.currentGesture = null;
+                this.video = null;
+                this.canvas = null;
+                this.ctx = null;
+                this.isCollecting = false;
+                this.collectedGestures = new Set();
+                
+                this.initializeElements();
+                this.setupEventListeners();
+                this.populateGestureGrid();
+            }
+            
+            initializeElements() {
+                this.video = document.getElementById('video');
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+            }
+            
+            setupEventListeners() {
+                document.getElementById('start-session-btn').addEventListener('click', () => this.startSession());
+                document.getElementById('start-camera-btn').addEventListener('click', () => this.startCamera());
+                document.getElementById('capture-btn').addEventListener('click', () => this.captureGesture());
+            }
+            
+            populateGestureGrid() {
+                const gestureGrid = document.getElementById('gesture-grid');
+                const gestures = {
+                    'alphabet': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+                    'numbers': '0123456789'.split(''),
+                    'words': ['HELLO', 'THANK_YOU', 'YES', 'NO', 'PLEASE', 'SORRY']
+                };
+                
+                Object.entries(gestures).forEach(([category, gestureList]) => {
+                    gestureList.forEach(gesture => {
+                        const btn = document.createElement('div');
+                        btn.className = 'gesture-btn';
+                        btn.textContent = gesture;
+                        btn.dataset.gesture = gesture;
+                        btn.dataset.category = category;
+                        btn.addEventListener('click', () => this.selectGesture(gesture, category));
+                        gestureGrid.appendChild(btn);
+                    });
+                });
+            }
+            
+            async startSession() {
+                const signerId = document.getElementById('signer-id').value;
+                if (!signerId) {
+                    this.showMessage('Please enter a Signer ID', 'error');
+                    return;
+                }
+                
+                const demographics = {
+                    age: document.getElementById('age').value,
+                    gender: document.getElementById('gender').value,
+                    signing_experience: document.getElementById('signing-experience').value,
+                    hearing_status: document.getElementById('hearing-status').value,
+                    region: document.getElementById('region').value
+                };
+                
+                try {
+                    const response = await fetch('/api/start_session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            signer_id: signerId,
+                            demographics: demographics
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'session_started') {
+                        this.currentSigner = signerId;
+                        this.showMessage('Session started successfully!', 'success');
+                        document.getElementById('session-setup').classList.add('hidden');
+                        document.getElementById('collection-interface').classList.remove('hidden');
+                        document.getElementById('progress-section').classList.remove('hidden');
+                    }
+                } catch (error) {
+                    this.showMessage('Error starting session: ' + error.message, 'error');
+                }
+            }
+            
+            async startCamera() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: 640, 
+                            height: 480,
+                            facingMode: 'user'
+                        } 
+                    });
+                    
+                    this.video.srcObject = stream;
+                    this.video.play();
+                    
+                    document.getElementById('start-camera-btn').disabled = true;
+                    document.getElementById('capture-btn').disabled = false;
+                    
+                    this.showMessage('Camera started! Position your hand clearly in the frame.', 'info');
+                } catch (error) {
+                    this.showMessage('Error accessing camera: ' + error.message, 'error');
+                }
+            }
+            
+            selectGesture(gesture, category) {
+                this.currentGesture = { gesture, category };
+                
+                // Update UI
+                document.querySelectorAll('.gesture-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                const selectedBtn = document.querySelector(`[data-gesture="${gesture}"]`);
+                selectedBtn.classList.add('active');
+                
+                document.getElementById('current-gesture-name').textContent = gesture;
+                document.getElementById('gesture-description').textContent = `Recording ${gesture} gesture...`;
+                
+                this.showMessage(`Selected gesture: ${gesture}. Click "Capture Gesture" to record.`, 'info');
+            }
+            
+            async captureGesture() {
+                if (!this.currentGesture) {
+                    this.showMessage('Please select a gesture first', 'error');
+                    return;
+                }
+                
+                try {
+                    // Capture frame from video
+                    this.canvas.width = this.video.videoWidth;
+                    this.canvas.height = this.video.videoHeight;
+                    this.ctx.drawImage(this.video, 0, 0);
+                    
+                    const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    const response = await fetch('/api/collect_sample', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            image_data: imageData,
+                            gesture: this.currentGesture.gesture,
+                            category: this.currentGesture.category
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.status === 'sample_collected') {
+                        this.collectedGestures.add(this.currentGesture.gesture);
+                        this.updateProgress();
+                        this.showMessage(`✅ ${this.currentGesture.gesture} gesture recorded successfully!`, 'success');
+                        
+                        // Mark gesture as collected
+                        const btn = document.querySelector(`[data-gesture="${this.currentGesture.gesture}"]`);
+                        btn.classList.add('collected');
+                        
+                        // Auto-select next gesture
+                        this.selectNextGesture();
+                    } else {
+                        this.showMessage(result.message || 'Error capturing gesture', 'error');
+                    }
+                } catch (error) {
+                    this.showMessage('Error capturing gesture: ' + error.message, 'error');
+                }
+            }
+            
+            selectNextGesture() {
+                const allGestures = document.querySelectorAll('.gesture-btn:not(.collected)');
+                if (allGestures.length > 0) {
+                    const nextGesture = allGestures[0];
+                    const gesture = nextGesture.dataset.gesture;
+                    const category = nextGesture.dataset.category;
+                    this.selectGesture(gesture, category);
+                }
+            }
+            
+            async updateProgress() {
+                try {
+                    const response = await fetch('/api/progress');
+                    const progress = await response.json();
+                    
+                    if (progress.status !== 'no_active_session') {
+                        document.getElementById('progress-text').textContent = `${progress.progress_percentage.toFixed(1)}%`;
+                        document.getElementById('progress-fill').style.width = `${progress.progress_percentage}%`;
+                        document.getElementById('collected-count').textContent = progress.collected_gestures;
+                        document.getElementById('total-count').textContent = progress.total_gestures;
+                    }
+                } catch (error) {
+                    console.error('Error updating progress:', error);
+                }
+            }
+            
+            showMessage(message, type) {
+                const messagesContainer = document.getElementById('status-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `status-message status-${type}`;
+                messageDiv.textContent = message;
+                
+                messagesContainer.appendChild(messageDiv);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.parentNode.removeChild(messageDiv);
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Initialize the data collector when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new ISLDataCollector();
+        });
+    </script>
+</body>
+</html>

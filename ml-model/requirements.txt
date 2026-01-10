@@ -1,0 +1,11 @@
+flask==3.0.0
+flask-cors==4.0.0
+numpy==1.24.4
+opencv-python==4.8.1.78
+opencv-python-headless==4.8.1.78
+mediapipe==0.10.9
+pillow>=10.1.0
+tensorflow==2.15.0
+pyyaml>=6.0
+tqdm>=4.66.0
+roboflow>=1.1.0

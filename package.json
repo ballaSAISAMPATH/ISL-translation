@@ -1,0 +1,30 @@
+{
+  "name": "isl-translation-system",
+  "version": "1.0.0",
+  "description": "Real-time AI-powered Indian Sign Language translation system with bidirectional communication",
+  "main": "server/index.js",
+  "scripts": {
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": [
+    "ISL",
+    "sign-language",
+    "accessibility",
+    "MERN",
+    "AI",
+    "translation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
+
+

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSpeak - AI Sign Language Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --error: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #475569;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 10px 10px -5px rgb(0 0 0 / 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .video-section {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+            aspect-ratio: 4/3;
+            margin-bottom: 1.5rem;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .video-overlay {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .current-gesture {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gesture-emoji {
+            font-size: 2rem;
+        }
+
+        .gesture-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .confidence-bar {
+            width: 100px;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error), var(--secondary), var(--success));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .gestures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .gesture-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .gesture-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .gesture-card.active {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .gesture-card .emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .gesture-card .name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .gesture-card .description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .stats-list {
+            list-style: none;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats-name {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stats-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .btn.secondary:hover {
+            background: var(--border);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            margin-right: 0.5rem;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .gestures-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .video-section {
+                padding: 1.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 SignSpeak AI</h1>
+            <p>Real-time sign language detection powered by advanced computer vision</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="videoElement" autoplay playsinline class="video-feed"></video>
+                    <canvas id="canvasElement" style="display:none;"></canvas>
+                    <div class="video-overlay">
+                        <div class="current-gesture">
+                            <span class="gesture-emoji" id="currentEmoji">🤖</span>
+                            <div>
+                                <div class="gesture-text" id="currentGesture">Starting up...</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);" id="gestureDescription">Initializing camera</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Confidence</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" onclick="refreshFeed()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn secondary" onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i>
+                        Fullscreen
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3>
+                        <i class="fas fa-hand-paper"></i>
+                        Available Gestures
+                    </h3>
+                    <div class="gestures-grid" id="gesturesGrid">
+                        <!-- Gestures will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>
+                        <i class="fas fa-chart-bar"></i>
+                        Detection Statistics
+                    </h3>
+                    <ul class="stats-list" id="statsList">
+                        <li class="stats-item">
+                            <span class="stats-name">No data yet</span>
+                            <span class="stats-count">0</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        System Status
+                    </h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <span class="status-indicator"></span>
+                        <span>Camera Active</span>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;">
+                        <p><strong>Tips for better detection:</strong></p>
+                        <ul style="margin-left: 1rem; margin-top: 0.5rem;">
+                            <li>Ensure good lighting</li>
+                            <li>Keep your hand visible</li>
+                            <li>Hold gestures for 2-3 seconds</li>
+                            <li>Avoid background clutter</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gestures = {};
+        let updateInterval;
+        let videoElement;
+        let canvasElement;
+        let canvasContext;
+        let stream = null;
+        let isProcessing = false;
+
+        // Initialize the application
+        window.addEventListener('load', function() {
+            console.log('Initializing SignSpeak...');
+            videoElement = document.getElementById('videoElement');
+            canvasElement = document.getElementById('canvasElement');
+            canvasContext = canvasElement.getContext('2d');
+            
+            loadGestures();
+            initCamera();
+        });
+
+        // Request camera permissions and initialize
+        async function initCamera() {
+            try {
+                console.log('Requesting camera access...');
+                document.getElementById('currentGesture').textContent = 'Requesting camera...';
+                document.getElementById('gestureDescription').textContent = 'Please allow camera access';
+                
+                // Request camera access with specific constraints
+                const constraints = {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                console.log('Camera access granted!');
+                videoElement.srcObject = stream;
+                
+                // Wait for video to be ready
+                videoElement.onloadedmetadata = () => {
+                    console.log('Video ready, starting processing...');
+                    canvasElement.width = videoElement.videoWidth;
+                    canvasElement.height = videoElement.videoHeight;
+                    
+                    document.getElementById('currentGesture').textContent = 'Camera Active';
+                    document.getElementById('gestureDescription').textContent = 'Show a hand gesture';
+                    
+                    // Start processing frames
+                    startProcessing();
+                };
+                
+            } catch (error) {
+                console.error('Camera access error:', error);
+                let errorMessage = 'Camera access denied';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Please allow camera access in your browser settings';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'No camera found on this device';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage = 'Camera is already in use';
+                } else {
+                    errorMessage = error.message || 'Camera error';
+                }
+                
+                document.getElementById('currentGesture').textContent = 'Camera Error';
+                document.getElementById('gestureDescription').textContent = errorMessage;
+            }
+        }
+
+        // Load available gestures
+        async function loadGestures() {
+            try {
+                console.log('Loading gestures...');
+                const response = await fetch('/gestures');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                gestures = await response.json();
+                console.log('Loaded gestures:', gestures);
+                renderGestures();
+            } catch (error) {
+                console.error('Failed to load gestures:', error);
+            }
+        }
+
+        // Render gestures grid
+        function renderGestures() {
+            const grid = document.getElementById('gesturesGrid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (Object.keys(gestures).length === 0) {
+                grid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem;">No gestures available</div>';
+                return;
+            }
+
+            Object.entries(gestures).forEach(([name, info]) => {
+                const card = document.createElement('div');
+                card.className = 'gesture-card';
+                card.innerHTML = `
+                    <span class="emoji">${info.emoji || '🤷'}</span>
+                    <div class="name">${name}</div>
+                    <div class="description">${info.description || 'No description'}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Process frames and send to server
+        async function processFrame() {
+            if (!videoElement || videoElement.paused || videoElement.ended || isProcessing) {
+                return;
+            }
+
+            try {
+                isProcessing = true;
+
+                // Draw current video frame to canvas
+                canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+                
+                // Convert canvas to blob
+                canvasElement.toBlob(async (blob) => {
+                    if (!blob) {
+                        isProcessing = false;
+                        return;
+                    }
+
+                    try {
+                        // Send frame to server for processing
+                        const formData = new FormData();
+                        formData.append('frame', blob, 'frame.jpg');
+
+                        const response = await fetch('/process_frame', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            updateUI(result);
+                        }
+                    } catch (error) {
+                        console.error('Frame processing error:', error);
+                    } finally {
+                        isProcessing = false;
+                    }
+                }, 'image/jpeg', 0.8);
+
+            } catch (error) {
+                console.error('Error capturing frame:', error);
+                isProcessing = false;
+            }
+        }
+
+        // Update UI with detection results
+        function updateUI(result) {
+            // Update current gesture display
+            const gestureData = gestures[result.current_gesture] || {
+                emoji: '🤖',
+                description: result.current_gesture === 'Unknown' ? 'Unknown gesture' : 'No hand detected'
+            };
+
+            document.getElementById('currentEmoji').textContent = gestureData.emoji;
+            document.getElementById('currentGesture').textContent = result.current_gesture;
+            document.getElementById('gestureDescription').textContent = gestureData.description;
+
+            // Update confidence bar
+            const confidenceFill = document.getElementById('confidenceFill');
+            if (confidenceFill) {
+                confidenceFill.style.width = (result.confidence * 100) + '%';
+            }
+
+            // Update statistics
+            renderStats(result.stats);
+
+            // Highlight active gesture
+            highlightActiveGesture(result.current_gesture);
+        }
+
+        // Render statistics
+        function renderStats(stats) {
+            const statsList = document.getElementById('statsList');
+            if (!statsList) return;
+
+            if (!stats || Object.keys(stats).length === 0) {
+                statsList.innerHTML = '<li class="stats-item"><span class="stats-name">No detections yet</span><span class="stats-count">0</span></li>';
+                return;
+            }
+
+            const sortedStats = Object.entries(stats).sort(([,a], [,b]) => b - a);
+            statsList.innerHTML = sortedStats.map(([gesture, count]) => `
+                <li class="stats-item">
+                    <span class="stats-name">${gesture}</span>
+                    <span class="stats-count">${count}</span>
+                </li>
+            `).join('');
+        }
+
+        // Highlight active gesture
+        function highlightActiveGesture(currentGesture) {
+            document.querySelectorAll('.gesture-card').forEach(card => {
+                card.classList.remove('active');
+                const nameElement = card.querySelector('.name');
+                if (nameElement && nameElement.textContent === currentGesture) {
+                    card.classList.add('active');
+                }
+            });
+        }
+
+        // Start processing frames at regular intervals
+        function startProcessing() {
+            // Process frames every 200ms (5 fps for analysis)
+            updateInterval = setInterval(processFrame, 200);
+        }
+
+        // Stop processing
+        function stopProcessing() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
+        }
+
+        // Utility functions
+        function refreshFeed() {
+            // Stop current stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            stopProcessing();
+            
+            // Reinitialize camera
+            setTimeout(() => {
+                initCamera();
+            }, 100);
+        }
+
+        function toggleFullscreen() {
+            const videoContainer = document.querySelector('.video-container');
+            if (!document.fullscreenElement) {
+                videoContainer.requestFullscreen().catch(err => {
+                    console.error('Error attempting to enable fullscreen:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            stopProcessing();
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+
+        // Handle visibility change (pause updates when tab is hidden)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopProcessing();
+            } else {
+                if (videoElement && !videoElement.paused) {
+                    startProcessing();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

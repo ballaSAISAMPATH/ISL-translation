@@ -1,0 +1,93 @@
+.hand-gesture-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  color: white;
+  text-align: center;
+}
+
+.hand-emoji {
+  font-size: 80px;
+  margin-bottom: 15px;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.hand-details {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 12px 20px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.finger-info,
+.thumb-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gesture-description {
+  font-size: 13px;
+  opacity: 0.95;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Size variations */
+.hand-icon-small .hand-emoji {
+  font-size: 40px;
+}
+
+.hand-icon-small .hand-details {
+  font-size: 10px;
+}
+
+.hand-icon-small .gesture-description {
+  font-size: 11px;
+}
+
+.hand-icon-medium .hand-emoji {
+  font-size: 80px;
+}
+
+.hand-icon-large .hand-emoji {
+  font-size: 120px;
+  margin-bottom: 20px;
+}
+
+.hand-icon-large .hand-details {
+  font-size: 16px;
+  padding: 15px 25px;
+}
+
+.hand-icon-large .gesture-description {
+  font-size: 15px;
+}
+
+/* Hover effect */
+.hand-gesture-icon:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+
+

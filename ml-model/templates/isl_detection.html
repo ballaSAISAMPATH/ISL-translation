@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISL Live Detection - Indian Sign Language Translator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --success: #10b981;
+            --error: #ef4444;
+            --info: #3b82f6;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border: #475569;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 10px 10px -5px rgb(0 0 0 / 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .video-section {
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            animation: fadeInLeft 0.8s ease;
+        }
+
+        .video-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+            aspect-ratio: 4/3;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--border);
+        }
+
+        .video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+            transform: scaleX(-1); /* Mirror the video */
+        }
+
+        .video-overlay {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-gesture {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .gesture-emoji {
+            font-size: 3rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .gesture-info {
+            flex: 1;
+        }
+
+        .gesture-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 0.25rem;
+        }
+
+        .gesture-description {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .confidence-section {
+            text-align: right;
+        }
+
+        .confidence-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .confidence-bar {
+            width: 120px;
+            height: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error), var(--secondary), var(--success));
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+
+        .confidence-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-top: 0.25rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeInRight 0.8s ease;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .card h3 i {
+            color: var(--primary);
+        }
+
+        .gestures-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 0.75rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .gestures-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .gestures-grid::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .gestures-grid::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .gesture-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .gesture-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .gesture-card.active {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.15);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .gesture-card .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .gesture-card .name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        .stats-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .stats-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .stats-list::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .stats-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-item:last-child {
+            border-bottom: none;
+        }
+
+        .stats-name {
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-count {
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            min-width: 35px;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .btn.secondary:hover {
+            background: var(--border);
+        }
+
+        .btn.danger {
+            background: var(--error);
+        }
+
+        .btn.danger:hover {
+            background: #dc2626;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--success);
+            margin-right: 0.5rem;
+            animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--border);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tips-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .tips-box ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            line-height: 1.8;
+        }
+
+        .tips-box li {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .video-section, .card {
+                padding: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .gesture-text {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤟 ISL Live Detection</h1>
+            <p>Real-time Indian Sign Language detection powered by MediaPipe and AI</p>
+        </div>
+
+        <div class="main-grid">
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="videoElement" autoplay playsinline class="video-feed"></video>
+                    <canvas id="canvasElement" style="display:none;"></canvas>
+                    <div class="video-overlay">
+                        <div class="current-gesture">
+                            <span class="gesture-emoji" id="currentEmoji">👋</span>
+                            <div class="gesture-info">
+                                <div class="gesture-text" id="currentGesture">Starting...</div>
+                                <div class="gesture-description" id="gestureDescription">Initializing camera</div>
+                            </div>
+                        </div>
+                        <div class="confidence-section">
+                            <div class="confidence-label">Confidence</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+                            </div>
+                            <div class="confidence-value" id="confidenceValue">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" onclick="refreshFeed()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Camera
+                    </button>
+                    <button class="btn secondary" onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i>
+                        Fullscreen
+                    </button>
+                    <button class="btn danger" onclick="clearStats()">
+                        <i class="fas fa-trash"></i>
+                        Clear Stats
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3>
+                        <i class="fas fa-hand-paper"></i>
+                        Available Gestures
+                    </h3>
+                    <div class="category-filter">
+                        <button class="filter-btn active" onclick="filterGestures('all')">All</button>
+                        <button class="filter-btn" onclick="filterGestures('alphabet')">Alphabet</button>
+                        <button class="filter-btn" onclick="filterGestures('number')">Numbers</button>
+                        <button class="filter-btn" onclick="filterGestures('common')">Common</button>
+                    </div>
+                    <div class="gestures-grid" id="gesturesGrid">
+                        <!-- Gestures will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>
+                        <i class="fas fa-chart-bar"></i>
+                        Detection Statistics
+                    </h3>
+                    <ul class="stats-list" id="statsList">
+                        <li class="stats-item">
+                            <span class="stats-name">No data yet</span>
+                            <span class="stats-count">0</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        System Status
+                    </h3>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <span class="status-indicator"></span>
+                        <span style="font-weight: 600;">Camera Active</span>
+                    </div>
+                    <div class="tips-box">
+                        <p style="font-weight: 600; margin-bottom: 0.5rem;">💡 Tips for Better Detection:</p>
+                        <ul>
+                            <li>Ensure good, even lighting</li>
+                            <li>Use a plain background</li>
+                            <li>Keep your hand centered</li>
+                            <li>Hold gestures steady for 1-2 seconds</li>
+                            <li>Make clear, distinct hand shapes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gestures = {};
+        let allGestures = {};
+        let updateInterval;
+        let videoElement;
+        let canvasElement;
+        let canvasContext;
+        let stream = null;
+        let isProcessing = false;
+        let currentFilter = 'all';
+
+        // Initialize the application
+        window.addEventListener('load', function() {
+            console.log('🚀 Initializing ISL Detection...');
+            videoElement = document.getElementById('videoElement');
+            canvasElement = document.getElementById('canvasElement');
+            canvasContext = canvasElement.getContext('2d');
+            
+            loadGestures();
+            initCamera();
+        });
+
+        // Request camera permissions and initialize
+        async function initCamera() {
+            try {
+                console.log('📹 Requesting camera access...');
+                document.getElementById('currentGesture').textContent = 'Requesting Camera';
+                document.getElementById('gestureDescription').textContent = 'Please allow camera access';
+                
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                console.log('✅ Camera access granted!');
+                videoElement.srcObject = stream;
+                
+                videoElement.onloadedmetadata = () => {
+                    console.log('📹 Video ready, starting processing...');
+                    canvasElement.width = videoElement.videoWidth;
+                    canvasElement.height = videoElement.videoHeight;
+                    
+                    document.getElementById('currentGesture').textContent = 'Camera Active';
+                    document.getElementById('gestureDescription').textContent = 'Show a hand gesture';
+                    
+                    startProcessing();
+                };
+                
+            } catch (error) {
+                console.error('❌ Camera access error:', error);
+                let errorMessage = 'Camera access denied';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Please allow camera access in browser settings';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'No camera found on this device';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage = 'Camera is already in use';
+                } else {
+                    errorMessage = error.message || 'Camera error';
+                }
+                
+                document.getElementById('currentGesture').textContent = 'Camera Error';
+                document.getElementById('gestureDescription').textContent = errorMessage;
+            }
+        }
+
+        // Load available gestures
+        async function loadGestures() {
+            try {
+                console.log('📚 Loading gestures...');
+                const response = await fetch('/gestures');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allGestures = await response.json();
+                gestures = allGestures;
+                console.log('✅ Loaded', Object.keys(gestures).length, 'gestures');
+                renderGestures();
+            } catch (error) {
+                console.error('❌ Failed to load gestures:', error);
+            }
+        }
+
+        // Filter gestures by category
+        function filterGestures(category) {
+            currentFilter = category;
+            
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (category === 'all') {
+                gestures = allGestures;
+            } else {
+                gestures = Object.fromEntries(
+                    Object.entries(allGestures).filter(([key, value]) => value.category === category)
+                );
+            }
+            
+            renderGestures();
+        }
+
+        // Render gestures grid
+        function renderGestures() {
+            const grid = document.getElementById('gesturesGrid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+
+            if (Object.keys(gestures).length === 0) {
+                grid.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem; grid-column: 1 / -1;">No gestures in this category</div>';
+                return;
+            }
+
+            Object.entries(gestures).forEach(([name, info]) => {
+                const card = document.createElement('div');
+                card.className = 'gesture-card';
+                card.dataset.gesture = name;
+                card.innerHTML = `
+                    <span class="emoji">${info.emoji || '🤷'}</span>
+                    <div class="name">${name}</div>
+                `;
+                card.title = info.description || 'No description';
+                grid.appendChild(card);
+            });
+        }
+
+        // Process frames and send to server
+        async function processFrame() {
+            if (!videoElement || videoElement.paused || videoElement.ended || isProcessing) {
+                return;
+            }
+
+            try {
+                isProcessing = true;
+
+                canvasContext.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+                
+                canvasElement.toBlob(async (blob) => {
+                    if (!blob) {
+                        isProcessing = false;
+                        return;
+                    }
+
+                    try {
+                        const formData = new FormData();
+                        formData.append('frame', blob, 'frame.jpg');
+
+                        const response = await fetch('/process_frame', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            updateUI(result);
+                        }
+                    } catch (error) {
+                        console.error('❌ Frame processing error:', error);
+                    } finally {
+                        isProcessing = false;
+                    }
+                }, 'image/jpeg', 0.8);
+
+            } catch (error) {
+                console.error('❌ Error capturing frame:', error);
+                isProcessing = false;
+            }
+        }
+
+        // Update UI with detection results
+        function updateUI(result) {
+            const gestureData = allGestures[result.current_gesture] || {
+                emoji: result.current_gesture === 'No Hand Detected' ? '👋' : '❓',
+                description: result.current_gesture === 'Unknown' ? 'Unknown gesture - try another' : result.current_gesture
+            };
+
+            document.getElementById('currentEmoji').textContent = gestureData.emoji;
+            document.getElementById('currentGesture').textContent = result.current_gesture;
+            document.getElementById('gestureDescription').textContent = gestureData.description;
+
+            const confidencePercent = Math.round(result.confidence * 100);
+            document.getElementById('confidenceFill').style.width = confidencePercent + '%';
+            document.getElementById('confidenceValue').textContent = confidencePercent + '%';
+
+            renderStats(result.stats);
+            highlightActiveGesture(result.current_gesture);
+        }
+
+        // Render statistics
+        function renderStats(stats) {
+            const statsList = document.getElementById('statsList');
+            if (!statsList) return;
+
+            if (!stats || Object.keys(stats).length === 0) {
+                statsList.innerHTML = '<li class="stats-item"><span class="stats-name">No detections yet</span><span class="stats-count">0</span></li>';
+                return;
+            }
+
+            const sortedStats = Object.entries(stats).sort(([,a], [,b]) => b - a);
+            statsList.innerHTML = sortedStats.map(([gesture, count]) => {
+                const emoji = allGestures[gesture]?.emoji || '❓';
+                return `
+                    <li class="stats-item">
+                        <span class="stats-name">${emoji} ${gesture}</span>
+                        <span class="stats-count">${count}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        // Highlight active gesture
+        function highlightActiveGesture(currentGesture) {
+            document.querySelectorAll('.gesture-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.dataset.gesture === currentGesture) {
+                    card.classList.add('active');
+                }
+            });
+        }
+
+        // Start processing frames
+        function startProcessing() {
+            updateInterval = setInterval(processFrame, 200); // 5 fps
+        }
+
+        // Stop processing
+        function stopProcessing() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+                updateInterval = null;
+            }
+        }
+
+        // Clear statistics
+        async function clearStats() {
+            try {
+                const response = await fetch('/clear_stats', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    console.log('✅ Statistics cleared');
+                    document.getElementById('statsList').innerHTML = '<li class="stats-item"><span class="stats-name">No detections yet</span><span class="stats-count">0</span></li>';
+                }
+            } catch (error) {
+                console.error('❌ Error clearing stats:', error);
+            }
+        }
+
+        // Refresh camera feed
+        function refreshFeed() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            stopProcessing();
+            
+            setTimeout(() => {
+                initCamera();
+            }, 100);
+        }
+
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const videoContainer = document.querySelector('.video-container');
+            if (!document.fullscreenElement) {
+                videoContainer.requestFullscreen().catch(err => {
+                    console.error('❌ Fullscreen error:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            stopProcessing();
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+
+        // Handle visibility change
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopProcessing();
+            } else {
+                if (videoElement && !videoElement.paused) {
+                    startProcessing();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+

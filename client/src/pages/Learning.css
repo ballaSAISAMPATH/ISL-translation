@@ -1,0 +1,467 @@
+.learning-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  padding: 40px 20px;
+}
+
+.learning-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.learning-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.learning-subtitle {
+  font-size: 20px;
+  color: #475569;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.learning-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto 60px;
+}
+
+.learning-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.learning-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.learning-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(6, 182, 212, 0.2);
+}
+
+.card-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 25px;
+  font-size: 32px;
+  color: white;
+}
+
+.card-icon.learn-isl {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+
+.card-icon.tutorial {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+}
+
+.card-icon.phrases {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.card-icon.visual {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.learning-card h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+.learning-card p {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.card-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.feature-tag {
+  background: linear-gradient(135deg, #dc2626 0%, #059669 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #dc2626 0%, #059669 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.card-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+}
+
+/* Tutorial Section Styles */
+.tutorial-section {
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  padding: 0 20px;
+}
+
+.tutorial-section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.tutorial-section-header h2 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 15px;
+}
+
+.tutorial-section-header p {
+  font-size: 18px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.tutorial-progress-bar {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  margin-bottom: 40px;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.progress-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.progress-percentage {
+  font-size: 20px;
+  font-weight: 700;
+  color: #8b5cf6;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 16px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 50%, #10b981 100%);
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.tutorial-modules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.tutorial-module-card {
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(139, 92, 246, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.tutorial-module-card:hover {
+  box-shadow: 0 15px 40px rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.tutorial-module-card.completed {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+}
+
+.tutorial-module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.tutorial-module-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.completed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tutorial-explanation {
+  color: #475569;
+  line-height: 1.6;
+  font-size: 15px;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+.tutorial-video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  background: #000;
+}
+
+.tutorial-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.tutorial-complete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.tutorial-complete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.tutorial-complete-btn.completed {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.tutorial-complete-btn.completed:hover {
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.learning-info {
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.learning-info h3 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 40px;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+}
+
+.tip-item {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.tip-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+}
+
+.tip-item h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.tip-item p {
+  color: #475569;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .learning-title {
+    font-size: 36px;
+  }
+  
+  .learning-subtitle {
+    font-size: 18px;
+  }
+  
+  .learning-options {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  
+  .learning-card {
+    padding: 25px;
+  }
+
+  .tutorial-section-header h2 {
+    font-size: 28px;
+  }
+
+  .tutorial-section-header p {
+    font-size: 16px;
+  }
+
+  .tutorial-progress-bar {
+    padding: 20px 25px;
+    margin-bottom: 30px;
+  }
+
+  .progress-label {
+    font-size: 14px;
+  }
+
+  .progress-percentage {
+    font-size: 18px;
+  }
+
+  .progress-bar-container {
+    height: 14px;
+  }
+
+  .tutorial-modules {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .tutorial-module-card {
+    padding: 20px;
+  }
+
+  .tutorial-module-header h3 {
+    font-size: 20px;
+  }
+
+  .tutorial-explanation {
+    font-size: 14px;
+  }
+  
+  .tips-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tutorial-module-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .completed-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .tutorial-progress-bar {
+    padding: 18px 20px;
+  }
+
+  .progress-label {
+    font-size: 13px;
+  }
+
+  .progress-percentage {
+    font-size: 16px;
+  }
+
+  .progress-bar-container {
+    height: 12px;
+  }
+}
