@@ -42,9 +42,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login user
-router.post('/login', async (req, res) => {
-  console.log("hiiii at login");
-  
+router.post('/login', async (req, res) => {  
   try {
     const { email, password } = req.body;
 
