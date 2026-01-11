@@ -16,26 +16,29 @@ os.makedirs(DATASET_DIR, exist_ok=True)
 
 @app.route("/predict", methods=["POST"])
 def predict_gesture():
-    print("hiiii")
     data = request.get_json()
-    print("RAW DATA:", data)
     landmarks = data.get("landmarks")
-    print("Incoming landmarks length:", len(landmarks) if landmarks else None)
-    print("Incoming landmarks sample:", landmarks[:6] if landmarks else None)
 
     if not landmarks or len(landmarks) != 63:
         return jsonify({"error": "Invalid landmarks"}), 400
 
     X = np.array(landmarks).reshape(1, -1)
 
-    prediction = model.predict(X)[0]
-    confidence = max(model.predict_proba(X)[0])
+    probabilities = model.predict_proba(X)[0]
+    
+    confidence = max(probabilities)
+    
+    THRESHOLD = 0.70 
+
+    if confidence > THRESHOLD:
+        prediction = model.predict(X)[0]
+    else:
+        prediction = "None"
 
     return jsonify({
         "prediction": prediction,
         "confidence": float(confidence)
     })
-
 
 @app.route("/", methods=["GET"])
 def health():
@@ -55,7 +58,7 @@ def receive_landmarks():
     label = data.get("label")
     landmarks = data.get("landmarks")
 
-    # -------- validation --------
+    # validation 
     if mode != "train":
         return jsonify({"error": "Invalid mode"}), 400
 
@@ -65,7 +68,7 @@ def receive_landmarks():
     if not landmarks or len(landmarks) != 63:
         return jsonify({"error": "Invalid landmarks"}), 400
 
-    # -------- save to CSV --------
+    # save to CSV
     csv_path = os.path.join(DATASET_DIR, f"{label}.csv")
     file_exists = os.path.isfile(csv_path)
 
