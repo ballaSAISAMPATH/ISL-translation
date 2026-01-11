@@ -28,7 +28,7 @@ def predict_gesture():
     
     confidence = max(probabilities)
     
-    THRESHOLD = 0.70 
+    THRESHOLD = 0.60 
 
     if confidence > THRESHOLD:
         prediction = model.predict(X)[0]
