@@ -7,7 +7,7 @@ import React, {
 import Webcam from "react-webcam";
 import axios from "axios";
 import { Hands } from "@mediapipe/hands";
-import { FaVideoSlash } from "react-icons/fa";
+import { FaVideoSlash, FaPlay, FaStop, FaCamera, FaCameraRetro } from "react-icons/fa";
 
 const FRAME_INTERVAL_MS = 200; // 5 FPS
 
@@ -16,8 +16,10 @@ function ISLPredictor() {
   const handsRef = useRef(null);
   const frameTimerRef = useRef(null);
   const isProcessingRef = useRef(false);
-
+  
+  // State Management
   const [isCameraOn, setIsCameraOn] = useState(false);
+  const [isPredicting, setIsPredicting] = useState(false);
   const [prediction, setPrediction] = useState("");
   const [confidence, setConfidence] = useState(0);
   const [status, setStatus] = useState("Idle");
@@ -28,7 +30,7 @@ function ISLPredictor() {
       const res = await axios.post("http://localhost:5001/predict", { landmarks: landmarks });
       setPrediction(res.data.prediction);
       setConfidence(res.data.confidence);
-      setStatus("Prediction successful");
+      setStatus("Predicting...");
     } catch (err) {
       console.error(err);
       setStatus("❌ Prediction failed");
@@ -51,10 +53,12 @@ function ISLPredictor() {
     });
 
     hands.onResults((results) => {
-      if (!results.multiHandLandmarks) return;
+      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+        return;
+      }
 
       const hand = results.multiHandLandmarks[0];
-      if (!hand || hand.length !== 21) return;
+      if (hand.length !== 21) return;
 
       const landmarks = [];
       for (let i = 0; i < hand.length; i++) {
@@ -72,7 +76,11 @@ function ISLPredictor() {
 
   /* ---------- frame loop ---------- */
   useEffect(() => {
-    if (!isCameraOn) return;
+    // Only run the interval if BOTH camera is on and prediction is active
+    if (!isCameraOn || !isPredicting) {
+        if (frameTimerRef.current) clearInterval(frameTimerRef.current);
+        return;
+    }
 
     frameTimerRef.current = setInterval(async () => {
       const video = webcamRef.current?.video;
@@ -87,209 +95,157 @@ function ISLPredictor() {
       try {
         isProcessingRef.current = true;
         await handsRef.current.send({ image: video });
+      } catch (err) {
+        console.error("MediaPipe Error:", err);
       } finally {
         isProcessingRef.current = false;
       }
     }, FRAME_INTERVAL_MS);
 
     return () => clearInterval(frameTimerRef.current);
-  }, [isCameraOn]);
+  }, [isCameraOn, isPredicting]);
 
   /* ---------- controls ---------- */
   const startCamera = () => {
     setIsCameraOn(true);
-    setStatus("Camera started");
+    setStatus("Camera active");
   };
 
   const stopCamera = () => {
     setIsCameraOn(false);
+    setIsPredicting(false);
     setPrediction("");
     setConfidence(0);
-    setStatus("Camera stopped");
+    setStatus("System stopped");
+  };
+
+  const togglePrediction = () => {
+    if (!isCameraOn) return;
+    const nextState = !isPredicting;
+    setIsPredicting(nextState);
+    setStatus(nextState ? "Prediction started" : "Prediction paused");
   };
 
   return (
-  <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100 m-0 p-0">
+    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* HEADER */}
+        <header className="text-center mb-10">
+          <h1 className="text-4xl font-black text-slate-800 mb-2">ISL Gesture Predictor</h1>
+          <p className="text-slate-500">Enable camera to start, then trigger AI prediction.</p>
+        </header>
 
-    {/* HERO SECTION */}
-    <div className=" text-center animate-fade-up flex flex-col ">
-      <h1 className="text-4xl md:text-5xl font-extrabold text-black bg-clip-text pt-10 ">
-        ISL Gesture Predictor
-      </h1>
-
-      <p className="text-lg text-gray-700 text-center py-4 ">
-        Real-time Indian Sign Language recognition powered by AI and MediaPipe
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
-        {["Real-time Detection", "95%+ Accuracy", "Privacy First"].map((text) => (
-          <div
-            key={text}
-            className="p-1 bg-linear-to-br text-white from-red-600 to-emerald-600 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 animate-scale-in"
-          >
-            <span className="font-semibold px-2 text-sm text-white">
-              {text}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-
-    {/* MAIN SECTION */}
-    <div className="px-6 md:px-12 pb-20">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-
-        {/* WEBCAM */}
-        <div className="relative animate-scale-in">
-          <div
-            className={`rounded-3xl shadow-2xl overflow-hidden border-4 transition-all duration-500 ${
-              isCameraOn
-                ? "border-green-400 ring-4 ring-green-200/50"
-                : "border-gray-200 bg-gray-100"
-            }`}
-          >
-            {isCameraOn ? (
-              <Webcam
-                ref={webcamRef}
-                mirrored
-                audio={false}
-                videoConstraints={{ facingMode: "user" }}
-                className="w-full h-125 object-cover"
-              />
-            ) : (
-              <div className=" h-125 flex flex-col items-center justify-center p-10 bg-black">
-                <FaVideoSlash className="text-gray-500 text-5xl"/>
-                <p className="text-gray-400">Camera is off</p>
-              </div>
-            )}
-          </div>
-
-          {/* STATUS BADGE */}
-          <div
-            className={`absolute -top-3 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full text-sm font-semibold shadow-lg ${
-              status.includes("successful") || status.includes("started")
-                ? "bg-green-500 text-white"
-                : status.includes("failed") || status.includes("stopped")
-                ? "bg-red-500 text-white"
-                : "bg-yellow-500 text-white"
-            }`}
-          >
-            {status}
-          </div>
-        </div>
-
-        {/* CONTROLS */}
-        <div className="space-y-8 animate-fade-up">
-
-          {!isCameraOn ? (
-            <button
-              onClick={startCamera}
-              className="w-full h-20 bg-linear-to-r from-green-500 to-green-600 text-white text-2xl font-bold rounded-3xl shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto  mb-16">
+          {["Real-time Detection", "95%+ Accuracy", "Privacy First"].map((text) => (
+            <div
+              key={text}
+              className="p-1 bg-linear-to-br text-white text-center from-red-600 to-emerald-600 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 animate-scale-in"
             >
-              Start Camera
-            </button>
-          ) : (
-            <button
-              onClick={stopCamera}
-              className="w-full h-20 bg-linear-to-r from-red-500 to-red-600 text-white text-2xl font-bold rounded-3xl shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
-            >
-              Stop Camera
-            </button>
-          )}
-
-          {/* PREDICTION */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">
-               Current Prediction
-            </h3>
-
-            <div className="p-8 bg-gray-100 rounded-2xl text-center shadow-inner mb-6">
-             
-              <div className="text-4xl font-bold text-gray-800">
-                {prediction || "No Gesture"}
-              </div>
+              <span className="font-semibold px-2 text-sm text-white">
+                {text}
+              </span>
             </div>
+          ))}
+      </div> 
 
-            {/* CONFIDENCE */}
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="font-semibold text-gray-700">Confidence</span>
-                <span className="font-mono text-xl font-bold text-green-600">
-                  {(confidence * 100).toFixed(1)}%
-                </span>
-              </div>
-
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div
-                  className="bg-linear-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-700"
-                  style={{ width: `${confidence * 100}%` }}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+          
+          {/* LEFT: VIDEO FEED */}
+          <div className="relative">
+            <div className={`aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 transition-all duration-300 ${isPredicting ? 'border-green-500' : 'border-slate-200'}`}>
+              {isCameraOn ? (
+                <Webcam
+                  ref={webcamRef}
+                  mirrored
+                  audio={false}
+                  className="w-full h-full object-cover"
                 />
-              </div>
+              ) : (
+                <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center text-slate-500">
+                  <FaVideoSlash size={48} className="mb-4" />
+                  <p>Camera is currently offline</p>
+                </div>
+              )}
+            </div>
+
+            {/* STATUS OVERLAY */}
+            <div className={`absolute top-4 left-4 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-white shadow-lg ${isPredicting ? 'bg-green-600 animate-pulse' : 'bg-slate-700'}`}>
+              {status}
             </div>
           </div>
 
+          {/* RIGHT: INTERFACE */}
+          <div className="space-y-6">
+            
+            {/* ACTION BUTTONS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                onClick={isCameraOn ? stopCamera : startCamera}
+                className={`flex items-center justify-center gap-3 h-16 rounded-2xl font-bold transition-all shadow-lg ${
+                    isCameraOn 
+                    ? "bg-white text-red-600 border-2 border-red-100 hover:bg-red-50" 
+                    : "bg-indigo-600 text-white hover:bg-indigo-700"
+                }`}
+              >
+                {isCameraOn ? <FaStop /> : <FaCamera />}
+                {isCameraOn ? "Stop Camera" : "Start Camera"}
+              </button>
+
+              <button
+                onClick={togglePrediction}
+                disabled={!isCameraOn}
+                className={`flex items-center justify-center gap-3 h-16 rounded-2xl font-bold transition-all shadow-lg ${
+                  !isCameraOn 
+                    ? "bg-slate-200 text-slate-400 cursor-not-allowed" 
+                    : isPredicting 
+                      ? "bg-amber-500 text-white hover:bg-amber-600" 
+                      : "bg-emerald-600 text-white hover:bg-emerald-700"
+                }`}
+              >
+                {isPredicting ? <FaStop /> : <FaPlay />}
+                {isPredicting ? "Pause Prediction" : "Start Prediction"}
+              </button>
+            </div>
+
+            {/* PREDICTION CARD */}
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100">
+              <h3 className="text-slate-400 uppercase text-xs font-black tracking-widest mb-6">AI Output</h3>
+              
+              <div className="flex flex-col items-center justify-center py-6 bg-slate-50 rounded-2xl border border-dashed border-slate-200 mb-6">
+                <span className="text-5xl font-black text-slate-800 tracking-tighter">
+                  {prediction || "---"}
+                </span>
+                <span className="text-slate-400 text-sm mt-2">Detected Gesture</span>
+              </div>
+
+              {/* CONFIDENCE BAR */}
+              <div>
+                <div className="flex justify-between items-end mb-2">
+                  <span className="text-sm font-bold text-slate-600">Confidence</span>
+                  <span className="text-2xl font-black text-emerald-600">{(confidence * 100).toFixed(0)}%</span>
+                </div>
+                <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-emerald-500 h-full transition-all duration-500 ease-out"
+                    style={{ width: `${confidence * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* INFO FOOTER */}
+            <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+                <p className="text-xs text-indigo-700 leading-relaxed">
+                    <strong>Note:</strong> Ensure your hand is fully visible within the frame. Prediction starts only after clicking "Start Prediction".
+                </p>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
-    {/* Instruction Section */}
-    <div>
-           <div className="card instructions-card">
-        <h3>📖 Instructions for Best Results</h3>
-        <ol>
-          <li><strong>Good Lighting:</strong> Ensure bright, even lighting on your hand</li>
-          <li><strong>Plain Background:</strong> Use a plain wall behind you (white or solid color)</li>
-          <li><strong>Camera Position:</strong> Position camera at chest level, hand clearly visible</li>
-          <li><strong>Start Camera:</strong> Click "Start Camera" to activate webcam</li>
-          <li><strong>Center Hand:</strong> Keep your hand in the center of the frame</li>
-          <li><strong>Start Capturing:</strong> Click "Start Capturing" to begin</li>
-          <li><strong>Make Signs Slowly:</strong> Hold each gesture for 1-2 seconds</li>
-          <li><strong>Clear Gestures:</strong> Make distinct, clear hand shapes</li>
-          <li><strong>Check Confidence:</strong> Wait for 60%+ confidence score</li>
-          <li><strong>Build Sentence:</strong> Each gesture will be captured automatically</li>
-          <li><strong>Stop & Review:</strong> Click "Stop Capturing" when done</li>
-          <li><strong>Hear & Save:</strong> Use "Speak" and "Save" buttons</li>
-        </ol>
-      </div>
-
-      <div className="card tips-card">
-        <h3>💡 Pro Tips for Accurate Detection</h3>
-        <div className="tips-grid-isl">
-          <div className="tip-box-isl">
-            <span className="tip-icon-big">💡</span>
-            <h4>Lighting</h4>
-            <p>Natural daylight or bright white light works best. Avoid shadows on your hand.</p>
-          </div>
-          <div className="tip-box-isl">
-            <span className="tip-icon-big">🖐️</span>
-            <h4>Hand Position</h4>
-            <p>Keep your hand flat facing the camera. Don't angle it sideways.</p>
-          </div>
-          <div className="tip-box-isl">
-            <span className="tip-icon-big">🎯</span>
-            <h4>Background</h4>
-            <p>Plain white wall or solid color background helps detection significantly.</p>
-          </div>
-          <div className="tip-box-isl">
-            <span className="tip-icon-big">⏱️</span>
-            <h4>Timing</h4>
-            <p>Hold each sign steady for 1-2 seconds before moving to the next one.</p>
-          </div>
-          <div className="tip-box-isl">
-            <span className="tip-icon-big">🎬</span>
-            <h4>Distance</h4>
-            <p>Keep your hand 1-2 feet from camera. Entire hand should be visible.</p>
-          </div>
-          <div className="tip-box-isl">
-            <span className="tip-icon-big">✨</span>
-            <h4>Clarity</h4>
-            <p>Make distinct finger positions. Spread fingers clearly for better recognition.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
+  );
 }
 
 export default ISLPredictor;

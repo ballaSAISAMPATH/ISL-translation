@@ -738,3 +738,62 @@ function ISLToText() {
 
 export default ISLToText;
 
+<div>
+           <div className="card instructions-card">
+        <h3>📖 Instructions for Best Results</h3>
+        <ol>
+          <li><strong>Good Lighting:</strong> Ensure bright, even lighting on your hand</li>
+          <li><strong>Plain Background:</strong> Use a plain wall behind you (white or solid color)</li>
+          <li><strong>Camera Position:</strong> Position camera at chest level, hand clearly visible</li>
+          <li><strong>Start Camera:</strong> Click "Start Camera" to activate webcam</li>
+          <li><strong>Center Hand:</strong> Keep your hand in the center of the frame</li>
+          <li><strong>Start Capturing:</strong> Click "Start Capturing" to begin</li>
+          <li><strong>Make Signs Slowly:</strong> Hold each gesture for 1-2 seconds</li>
+          <li><strong>Clear Gestures:</strong> Make distinct, clear hand shapes</li>
+          <li><strong>Check Confidence:</strong> Wait for 60%+ confidence score</li>
+          <li><strong>Build Sentence:</strong> Each gesture will be captured automatically</li>
+          <li><strong>Stop & Review:</strong> Click "Stop Capturing" when done</li>
+          <li><strong>Hear & Save:</strong> Use "Speak" and "Save" buttons</li>
+        </ol>
+      </div>
+
+      <div className="card tips-card">
+        <h3>💡 Pro Tips for Accurate Detection</h3>
+        <div className="tips-grid-isl">
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">💡</span>
+            <h4>Lighting</h4>
+            <p>Natural daylight or bright white light works best. Avoid shadows on your hand.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">🖐️</span>
+            <h4>Hand Position</h4>
+            <p>Keep your hand flat facing the camera. Don't angle it sideways.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">🎯</span>
+            <h4>Background</h4>
+            <p>Plain white wall or solid color background helps detection significantly.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">⏱️</span>
+            <h4>Timing</h4>
+            <p>Hold each sign steady for 1-2 seconds before moving to the next one.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">🎬</span>
+            <h4>Distance</h4>
+            <p>Keep your hand 1-2 feet from camera. Entire hand should be visible.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">✨</span>
+            <h4>Clarity</h4>
+            <p>Make distinct finger positions. Spread fingers clearly for better recognition.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
