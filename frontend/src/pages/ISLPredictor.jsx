@@ -4,10 +4,10 @@ import React, {
   useState,
   useCallback
 } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import Webcam from "react-webcam";
 import axios from "axios";
 import { Hands } from "@mediapipe/hands";
+import { FaVideoSlash } from "react-icons/fa";
 
 const FRAME_INTERVAL_MS = 200; // 5 FPS
 
@@ -109,254 +109,187 @@ function ISLPredictor() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100">
-      {/* Hero Section */}
-      <motion.div
-        className="hero-section pt-12 pb-20 px-6 md:px-12 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.div
-          animate={{ 
-            scale: [1, 1.05, 1],
-            rotate: [0, 5, 0]
-          }}
-          transition={{ 
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-          className="inline-block mb-6"
-        >
-          <div className="text-6xl md:text-8xl">🤟</div>
-        </motion.div>
-        
-        <h1 className="hero-title text-4xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 leading-tight">
-          ISL Gesture Predictor
-        </h1>
-        <p className="hero-subtitle text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto mb-12 leading-relaxed">
-          Real-time Indian Sign Language recognition powered by AI and MediaPipe
-        </p>
-        
-        <div className="hero-features max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <motion.div className="hero-feature flex flex-col items-center p-6 bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50" 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}>
-            <div className="text-4xl mb-4">⚡</div>
-            <span className="font-semibold text-lg text-gray-800">Real-time Detection</span>
-          </motion.div>
-          <motion.div className="hero-feature flex flex-col items-center p-6 bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50" 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}>
-            <div className="text-4xl mb-4">🎯</div>
-            <span className="font-semibold text-lg text-gray-800">95%+ Accuracy</span>
-          </motion.div>
-          <motion.div className="hero-feature flex flex-col items-center p-6 bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50" 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}>
-            <div className="text-4xl mb-4">🔒</div>
-            <span className="font-semibold text-lg text-gray-800">Privacy First</span>
-          </motion.div>
+  <div className="min-h-screen bg-linear-to-br from-blue-50 via-indigo-50 to-purple-100 m-0 p-0">
+
+    {/* HERO SECTION */}
+    <div className=" text-center animate-fade-up flex flex-col ">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-black bg-clip-text pt-10 ">
+        ISL Gesture Predictor
+      </h1>
+
+      <p className="text-lg text-gray-700 text-center py-4 ">
+        Real-time Indian Sign Language recognition powered by AI and MediaPipe
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
+        {["Real-time Detection", "95%+ Accuracy", "Privacy First"].map((text) => (
+          <div
+            key={text}
+            className="p-1 bg-linear-to-br text-white from-red-600 to-emerald-600 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50 animate-scale-in"
+          >
+            <span className="font-semibold px-2 text-sm text-white">
+              {text}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* MAIN SECTION */}
+    <div className="px-6 md:px-12 pb-20">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+        {/* WEBCAM */}
+        <div className="relative animate-scale-in">
+          <div
+            className={`rounded-3xl shadow-2xl overflow-hidden border-4 transition-all duration-500 ${
+              isCameraOn
+                ? "border-green-400 ring-4 ring-green-200/50"
+                : "border-gray-200 bg-gray-100"
+            }`}
+          >
+            {isCameraOn ? (
+              <Webcam
+                ref={webcamRef}
+                mirrored
+                audio={false}
+                videoConstraints={{ facingMode: "user" }}
+                className="w-full h-125 object-cover"
+              />
+            ) : (
+              <div className=" h-125 flex flex-col items-center justify-center p-10 bg-black">
+                <FaVideoSlash className="text-gray-500 text-5xl"/>
+                <p className="text-gray-400">Camera is off</p>
+              </div>
+            )}
+          </div>
+
+          {/* STATUS BADGE */}
+          <div
+            className={`absolute -top-3 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full text-sm font-semibold shadow-lg ${
+              status.includes("successful") || status.includes("started")
+                ? "bg-green-500 text-white"
+                : status.includes("failed") || status.includes("stopped")
+                ? "bg-red-500 text-white"
+                : "bg-yellow-500 text-white"
+            }`}
+          >
+            {status}
+          </div>
         </div>
-      </motion.div>
 
-      {/* Main Control Section */}
-      <motion.div
-        className="main-section px-6 md:px-12 pb-20"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      >
-        {/* Webcam & Controls */}
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Webcam Container */}
-          <motion.div className="webcam-container relative group"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.4 }}>
-            <div className={`webcam-wrapper rounded-3xl shadow-2xl overflow-hidden border-4 transition-all duration-500 ${
-              isCameraOn 
-                ? 'border-green-400 bg-green-50/50 ring-4 ring-green-200/50' 
-                : 'border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100'
-            }`}>
-              <AnimatePresence mode="wait">
-                {isCameraOn ? (
-                  <motion.div
-                    key="webcam"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Webcam
-                      ref={webcamRef}
-                      mirrored
-                      audio={false}
-                      videoConstraints={{ facingMode: "user" }}
-                      className="w-full h-[500px] md:h-[600px] object-cover"
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="placeholder"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="w-full h-[500px] md:h-[600px] bg-gradient-to-br from-blue-400 to-purple-500 flex flex-col items-center justify-center text-white p-12"
-                  >
-                    <div className="text-8xl mb-8 animate-pulse">📷</div>
-                    <h3 className="text-3xl font-bold mb-4">Camera Ready</h3>
-                    <p className="text-xl opacity-90">Click Start to begin gesture detection</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            
-            {/* Status Badge */}
-            <div className={`absolute -top-3 left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-full text-sm font-semibold shadow-lg ${
-              status.includes('successful') || status.includes('started')
-                ? 'bg-green-500 text-white'
-                : status.includes('failed') || status.includes('stopped')
-                ? 'bg-red-500 text-white'
-                : 'bg-yellow-500 text-white'
-            }`}>
-              {status}
-            </div>
-          </motion.div>
+        {/* CONTROLS */}
+        <div className="space-y-8 animate-fade-up">
 
-          {/* Controls & Results */}
-          <motion.div className="controls-section space-y-8"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.5 }}>
-            
-            {/* Control Buttons */}
-            <div className="control-buttons space-y-4">
-              <AnimatePresence mode="wait">
-                {!isCameraOn ? (
-                  <motion.button
-                    key="start"
-                    onClick={startCamera}
-                    className="w-full h-20 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-4 text-shadow-lg"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-3xl">📷</span>
-                    Start Camera
-                  </motion.button>
-                ) : (
-                  <motion.button
-                    key="stop"
-                    onClick={stopCamera}
-                    className="w-full h-20 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white text-2xl font-bold rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-4 text-shadow-lg"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-3xl">⏹️</span>
-                    Stop Camera
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </div>
+          {!isCameraOn ? (
+            <button
+              onClick={startCamera}
+              className="w-full h-20 bg-linear-to-r from-green-500 to-green-600 text-white text-2xl font-bold rounded-3xl shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              Start Camera
+            </button>
+          ) : (
+            <button
+              onClick={stopCamera}
+              className="w-full h-20 bg-linear-to-r from-red-500 to-red-600 text-white text-2xl font-bold rounded-3xl shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+            >
+              Stop Camera
+            </button>
+          )}
 
-            {/* Prediction Results */}
-            <div className="prediction-card bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                <span className="text-3xl">🎯</span>
-                Current Prediction
-              </h3>
-              
-              <div className="space-y-6">
-                <div className="prediction-display p-8 bg-gradient-to-br rounded-2xl text-center shadow-xl border-4 border-gray-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
-                  <div className="text-6xl mb-4 animate-pulse">
-                    {prediction || '👋'}
-                  </div>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent tracking-wide">
-                    {prediction || 'No Gesture'}
-                  </div>
-                </div>
-                
-                <div className="confidence-bar">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-lg text-gray-700">Confidence</span>
-                    <span className="font-mono text-2xl font-bold text-green-600">
-                      {(confidence * 100).toFixed(1)}%
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
-                    <motion.div 
-                      className="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full shadow-lg"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${confidence * 100}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                    />
-                  </div>
-                </div>
+          {/* PREDICTION */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/50">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">
+               Current Prediction
+            </h3>
+
+            <div className="p-8 bg-gray-100 rounded-2xl text-center shadow-inner mb-6">
+             
+              <div className="text-4xl font-bold text-gray-800">
+                {prediction || "No Gesture"}
               </div>
             </div>
-          </motion.div>
-        </div>
-      </motion.div>
 
-      {/* Features Section */}
-      <motion.div
-        className="features-section px-6 md:px-12 pb-20 pt-12"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-      >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
-              🚀 How It Works
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Advanced AI detects hand landmarks in real-time and translates Indian Sign Language gestures instantly
-            </p>
+            {/* CONFIDENCE */}
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="font-semibold text-gray-700">Confidence</span>
+                <span className="font-mono text-xl font-bold text-green-600">
+                  {(confidence * 100).toFixed(1)}%
+                </span>
+              </div>
+
+              <div className="w-full bg-gray-200 rounded-full h-4">
+                <div
+                  className="bg-linear-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-700"
+                  style={{ width: `${confidence * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div className="feature-card bg-white/70 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50 hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 group"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}>
-              <div className="card-icon text-5xl group-hover:scale-110 transition-transform duration-300 mb-6">📹</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Camera Capture</h3>
-              <p className="text-gray-600 leading-relaxed">High-precision webcam feed captures hand movements at 5 FPS</p>
-            </motion.div>
-
-            <motion.div className="feature-card bg-white/70 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50 hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 group"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}>
-              <div className="card-icon text-5xl group-hover:scale-110 transition-transform duration-300 mb-6">🤖</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">AI Processing</h3>
-              <p className="text-gray-600 leading-relaxed">MediaPipe extracts 63 hand landmarks (x,y,z) for gesture analysis</p>
-            </motion.div>
-
-            <motion.div className="feature-card bg-white/70 backdrop-blur-sm p-8 rounded-3xl shadow-xl border border-white/50 hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 group"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}>
-              <div className="card-icon text-5xl group-hover:scale-110 transition-transform duration-300 mb-6">✨</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Instant Results</h3>
-              <p className="text-gray-600 leading-relaxed">Backend ML model delivers predictions with confidence scores in milliseconds</p>
-            </motion.div>
-          </div>
         </div>
-      </motion.div>
+      </div>
     </div>
-  );
+    {/* Instruction Section */}
+    <div>
+           <div className="card instructions-card">
+        <h3>📖 Instructions for Best Results</h3>
+        <ol>
+          <li><strong>Good Lighting:</strong> Ensure bright, even lighting on your hand</li>
+          <li><strong>Plain Background:</strong> Use a plain wall behind you (white or solid color)</li>
+          <li><strong>Camera Position:</strong> Position camera at chest level, hand clearly visible</li>
+          <li><strong>Start Camera:</strong> Click "Start Camera" to activate webcam</li>
+          <li><strong>Center Hand:</strong> Keep your hand in the center of the frame</li>
+          <li><strong>Start Capturing:</strong> Click "Start Capturing" to begin</li>
+          <li><strong>Make Signs Slowly:</strong> Hold each gesture for 1-2 seconds</li>
+          <li><strong>Clear Gestures:</strong> Make distinct, clear hand shapes</li>
+          <li><strong>Check Confidence:</strong> Wait for 60%+ confidence score</li>
+          <li><strong>Build Sentence:</strong> Each gesture will be captured automatically</li>
+          <li><strong>Stop & Review:</strong> Click "Stop Capturing" when done</li>
+          <li><strong>Hear & Save:</strong> Use "Speak" and "Save" buttons</li>
+        </ol>
+      </div>
+
+      <div className="card tips-card">
+        <h3>💡 Pro Tips for Accurate Detection</h3>
+        <div className="tips-grid-isl">
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">💡</span>
+            <h4>Lighting</h4>
+            <p>Natural daylight or bright white light works best. Avoid shadows on your hand.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">🖐️</span>
+            <h4>Hand Position</h4>
+            <p>Keep your hand flat facing the camera. Don't angle it sideways.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">🎯</span>
+            <h4>Background</h4>
+            <p>Plain white wall or solid color background helps detection significantly.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">⏱️</span>
+            <h4>Timing</h4>
+            <p>Hold each sign steady for 1-2 seconds before moving to the next one.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">🎬</span>
+            <h4>Distance</h4>
+            <p>Keep your hand 1-2 feet from camera. Entire hand should be visible.</p>
+          </div>
+          <div className="tip-box-isl">
+            <span className="tip-icon-big">✨</span>
+            <h4>Clarity</h4>
+            <p>Make distinct finger positions. Spread fingers clearly for better recognition.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 }
 
 export default ISLPredictor;
