@@ -43,7 +43,7 @@ function ISLTrainer() {
         return next;
       });
     } catch (err) {
-      setStatus("❌ Server Error (Check Flask)");
+      setStatus(" Server Error (Check Flask) :" ,err);
     }
   }, [selectedLabel]);
 
@@ -168,7 +168,7 @@ function ISLTrainer() {
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
                 <button 
                     onClick={() => setIsCameraOn(!isCameraOn)}
-                    className={`px-8 py-3 rounded-full shadow-2xl font-bold flex items-center gap-2 transition-all active:scale-95 ${isCameraOn ? 'bg-white text-red-600' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                    className={`px-8 py-3 rounded-full shadow-2xl font-bold flex items-center gap-2 transition-all active:scale-95 ${isCameraOn ? 'bg-red-600 text-white hover:bg-white hover:text-red-600' : 'bg-green-600 text-white hover:bg-green-700'}`}
                 >
                     {isCameraOn ? <><FaStop /> Stop Camera</> : <><FaCamera /> Start Camera</>}
                 </button>
@@ -176,7 +176,7 @@ function ISLTrainer() {
             </div>
 
             {/* TRAINING PROGRESS CARD */}
-            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-4xl p-8 shadow-sm border border-slate-200">
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Dataset Progress</h3>
@@ -189,7 +189,7 @@ function ISLTrainer() {
                 </div>
                 <div className="w-full bg-slate-100 h-6 rounded-full overflow-hidden p-1.5 border border-slate-200">
                     <div 
-                        className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500 ease-out"
+                        className="h-full bg-linear-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500 ease-out"
                         style={{ width: `${(samples / MAX_SAMPLES) * 100}%` }}
                     />
                 </div>
@@ -201,7 +201,7 @@ function ISLTrainer() {
           <div className="lg:col-span-5 space-y-6">
             
             {/* ADD NEW GESTURE */}
-            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200">
+            <div className="bg-white rounded-4xl p-8 shadow-sm border border-slate-200">
                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Add New Gesture</h3>
                 <div className="flex gap-2">
                     <input 
@@ -216,9 +216,9 @@ function ISLTrainer() {
             </div>
 
             {/* GESTURE LIST */}
-            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200 flex-1">
+            <div className="bg-white rounded-4xl p-8 shadow-sm border border-slate-200 flex-1">
                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Training Labels</h3>
-                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
                     {gestures.map((g) => (
                         <div 
                             key={g} 
@@ -250,7 +250,7 @@ function ISLTrainer() {
             </div>
 
             {/* TIPS CARD */}
-            <div className="bg-slate-800 rounded-[2rem] p-8 text-white">
+            <div className="bg-slate-800 rounded-4xl p-8 text-white">
                 <div className="flex items-center gap-3 mb-4 text-indigo-400">
                     <span className="text-2xl">💡</span>
                     <h4 className="font-bold uppercase tracking-widest text-xs">Training Tip</h4>
