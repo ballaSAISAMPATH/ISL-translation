@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FaHome, FaHandPaper, FaKeyboard, FaHistory, FaBook, FaUser, FaSignOutAlt, FaBars, FaTimes, FaLanguage, FaLightbulb, FaCommentDots, FaImages } from 'react-icons/fa';
+import { FaHome, FaHandPaper, FaKeyboard, FaHistory, FaBook, FaUser,
+   FaSignOutAlt, FaBars, FaTimes, FaLanguage, FaLightbulb, FaCommentDots, FaImages } from 'react-icons/fa';
+import { RiRobot2Fill } from "react-icons/ri";
+
 import './Navbar.css';
 
 function Navbar() {
@@ -38,16 +41,16 @@ function Navbar() {
           </li>
           <li className="nav-item">
             <Link to="/train" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
-              <FaHome /> <span>train</span>
+              <RiRobot2Fill /> <span>train</span>
             </Link>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link to="/predict" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
               <FaHome /> <span>predict</span>
             </Link>
-          </li>
+          </li> */}
           <li className="nav-item">
-            <Link to="/translation" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
+            <Link to="/predict" className="nav-link" onClick={() => setMobileMenuOpen(false)}>
               <FaLanguage /> <span>Translation</span>
             </Link>
           </li>
