@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import axios from 'axios';
-import { motion } from 'framer-motion';
 import { FaVideo, FaVideoSlash, FaPlay, FaStop, FaVolumeUp, FaTrash, FaSave } from 'react-icons/fa';
 import { Hands } from '@mediapipe/hands';
 import './ISLToText.css';
@@ -423,7 +422,7 @@ function ISLToText() {
 
       alert('Translation saved successfully!');
     } catch (err) {
-      setError('Failed to save translation');
+      setError('Failed to save translation :', err);
     } finally {
       setIsSaving(false);
     }
