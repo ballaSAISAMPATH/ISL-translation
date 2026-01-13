@@ -140,7 +140,7 @@ function ISLTrainer() {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
               <FaMicrochip />
             </div>
-            <span className="font-bold text-xl tracking-tight text-slate-800">ISL Trainer <span className="text-indigo-600 underline decoration-2">PRO</span></span>
+            <span className="font-bold text-xl tracking-tight text-slate-800">ISL Trainer </span>
           </div>
           <div className={`px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${isCapturing ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-slate-100 text-slate-500'}`}>
             {status}

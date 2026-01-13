@@ -23,6 +23,7 @@ import Profile from './pages/Profile';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ISLTrainer from './pages/ISLTrainer';
 import ISLPredictor from './pages/ISLPredictor';
+import Chatbot from './pages/Chatbot';
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
@@ -56,6 +57,7 @@ function AppContent() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         </Routes>
       </Router>
+      <Chatbot/>
     </div>
   );
 }
