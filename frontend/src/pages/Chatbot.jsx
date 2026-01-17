@@ -68,22 +68,24 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-sans text-gray-800">
+    <div>
+      {isOpen?(
+        <div className="fixed bottom-17 right-6 z-50 font-sans text-gray-800">
       {/* Chat Window */}
       <div
         ref={chatRef}
-        className={`mb-4 w-[90vw] sm:w-96 h-125 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 transition-all duration-300 origin-bottom-right ${
+        className={`mb-4 w-[90vw] sm:w-125 h-125 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 transition-all duration-300 origin-bottom-right ${
           isOpen 
             ? "opacity-100 scale-100 translate-y-0" 
             : "opacity-0 scale-95 translate-y-10 pointer-events-none"
         }`}
       >
         {/* Header */}
-        <div className="bg-linear-to-r from-indigo-600 to-violet-600 p-4 text-white flex justify-between items-center shadow-lg">
+        <div className="bg-linear-to-r from-indigo-600 to-violet-600 p-2 text-white flex justify-between items-center shadow-lg">
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
-                <RiRobot3Fill size={24} />
+                <RiRobot3Fill size={20} />
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 border-indigo-600 rounded-full"></span>
             </div>
@@ -98,7 +100,7 @@ export default function Chatbot() {
         </div>
 
         {/* Message Area */}
-        <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto bg-[#F8F9FD] space-y-4">
+        <div ref={scrollRef} className="flex-1 p-1 overflow-y-auto bg-[#F8F9FD] space-y-4">
           {messages.map((msg, index) => (
             <div key={index} className={`flex gap-2 items-end ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               {msg.role === "bot" && (
@@ -107,7 +109,7 @@ export default function Chatbot() {
                 </div>
               )}
               
-              <div className={`p-3 rounded-2xl text-sm leading-relaxed max-w-[80%] shadow-sm ${
+              <div className={`py-2 px-4 rounded-2xl text-sm leading-relaxed max-w-[80%] shadow-sm ${
                 msg.role === "user" 
                 ? "bg-indigo-600 text-white rounded-br-none" 
                 : "bg-white border border-gray-100 text-gray-700 rounded-bl-none"
@@ -136,7 +138,7 @@ export default function Chatbot() {
         </div>
 
         {/* Footer Input */}
-        <div className="p-4 bg-white border-t border-gray-100">
+        <div className="p-2 bg-white border-t border-gray-100">
           <form onSubmit={chatbotFormSubmitted} className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-1 focus-within:border-indigo-400 focus-within:ring-1 focus-within:ring-indigo-400 transition-all">
             <input
               type="text"
@@ -160,10 +162,15 @@ export default function Chatbot() {
       </div>
 
       {/* Floating Toggle Button */}
-      <div className="flex justify-end">
+      
+    </div>
+      ):(
+        ""
+      )}
+      <div className="fixed right-6 animate-bounce bottom-6 flex justify-end">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`relative w-14 h-14 flex justify-center items-center rounded-2xl shadow-2xl transition-all duration-300 border-none outline-none group hover:scale-105 active:scale-95 ${
+          className={` w-14 h-14 flex justify-center items-center rounded-2xl shadow-2xl transition-all duration-300 border-none outline-none group hover:scale-105 active:scale-95 ${
             isOpen ? "bg-gray-900" : "bg-indigo-600"
           }`}
         >
