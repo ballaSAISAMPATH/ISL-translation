@@ -14,7 +14,6 @@ import Learn from './pages/Learn';
 import Tutorial from './pages/Tutorial';
 import Phrases from './pages/Phrases';
 import ImageGuide from './pages/ImageGuide';
-import VisualReference from './pages/VisualReference';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
@@ -53,7 +52,6 @@ function AppContent() {
           <Route path="/tutorial" element={<ProtectedRoute><Tutorial /></ProtectedRoute>} />
           <Route path="/phrases" element={<ProtectedRoute><Phrases /></ProtectedRoute>} />
           <Route path="/image-guide" element={<ProtectedRoute><ImageGuide /></ProtectedRoute>} />
-          <Route path="/visual-reference" element={<ProtectedRoute><VisualReference /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         </Routes>
       </Router>

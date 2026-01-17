@@ -72,14 +72,14 @@ export default function Chatbot() {
       {/* Chat Window */}
       <div
         ref={chatRef}
-        className={`mb-4 w-[90vw] sm:w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 transition-all duration-300 origin-bottom-right ${
+        className={`mb-4 w-[90vw] sm:w-96 h-125 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100 transition-all duration-300 origin-bottom-right ${
           isOpen 
             ? "opacity-100 scale-100 translate-y-0" 
             : "opacity-0 scale-95 translate-y-10 pointer-events-none"
         }`}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-4 text-white flex justify-between items-center shadow-lg">
+        <div className="bg-linear-to-r from-indigo-600 to-violet-600 p-4 text-white flex justify-between items-center shadow-lg">
           <div className="flex items-center gap-3">
             <div className="relative">
               <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
