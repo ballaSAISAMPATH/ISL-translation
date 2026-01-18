@@ -97,7 +97,7 @@ function Learn() {
     <div className="learn-container">
       <motion.div className="page-header" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <h1><FaBook /> Learn Indian Sign Language</h1>
-        <p>Browse the ISL alphabet and numbers</p>
+        <h2 className=' font-bold text-lg text-black '>Browse the ISL alphabet and numbers</h2>
       </motion.div>
 
       <div className="card">

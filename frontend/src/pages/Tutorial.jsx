@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { FaPlayCircle, FaCheckCircle, FaLightbulb, FaVideo, FaBook } from 'react-icons/fa';
 import './Tutorial.css';
 
@@ -291,13 +292,13 @@ function Tutorial() {
             <FaBook />
             <h3>ISL Dictionary</h3>
             <p>Comprehensive dictionary with 1000+ signs</p>
-            <button className="btn btn-secondary btn-sm">Browse Dictionary</button>
+            <button className="btn btn-secondary btn-sm"><Link to="/learn">Browse Dictionary</Link></button>
           </div>
           <div className="resource-card">
             <FaVideo />
-            <h3>Video Tutorials</h3>
+            <button>Video Tutorials</button>
             <p>Watch detailed video demonstrations</p>
-            <button className="btn btn-secondary btn-sm">Watch Videos</button>
+            <button className="btn btn-secondary btn-sm"><Link to="/phrases">Watch Videos</Link></button>
           </div>
           <div className="resource-card">
             <FaLightbulb />
