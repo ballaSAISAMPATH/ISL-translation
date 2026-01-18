@@ -13,7 +13,6 @@ function Learn() {
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
   const [loading, setLoading] = useState(true);
   const [selectedGesture, setSelectedGesture] = useState(null);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchGestures();

@@ -1,83 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { motion } from 'framer-motion';
-import { FaBook, FaSearch, FaInfoCircle, FaLightbulb } from 'react-icons/fa';
-import './Phrases.css';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaBook,
+  FaSearch,
+  FaSortAmountDown,
+  FaSortAmountUp,
+} from "react-icons/fa";
 
 function Phrases() {
-  const [phrases, setPhrases] = useState([]);
-  const [filteredPhrases, setFilteredPhrases] = useState([]);
-  const [category, setCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [selectedPhrase, setSelectedPhrase] = useState(null);
-  const [error, setError] = useState('');
+  const [videos, setVideos] = useState([]);
+  const [filteredVideos, setFilteredVideos] = useState([]);
+  const [category, setCategory] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  useEffect(() => {
-    fetchPhrases();
-  }, []);
 
-  useEffect(() => {
-    filterPhrases();
-    // eslint-disable-next-line
-  }, [phrases, category, searchTerm]);
+  const loadPhraseVideos = () => {
+    const phraseData = {
+      "Daily Life": [
+        "Hungry",
+        "I am hungry",
+        "I am sad",
+        "I am thirsty",
+        "I understand",
+      ],
+      "Emergency": ["Do not hurt me"],
+      "Emotions": ["I Love you"],
+      "Greetings": [
+        "Good afternoon",
+        "Good evening",
+        "Good morning",
+        "Good night",
+        "Hello",
+        "How are you",
+        "Nice to meet you",
+      ],
+      "Polite Expressions": [
+        "Congratulations",
+        "Don_t worry",
+        "Excuse me",
+        "Please",
+      ],
+      "Questions": ["Are you free today", "Are you okay"],
+    };
 
-  const fetchPhrases = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('/api/phrases');
-      setPhrases(response.data.phrases);
-    } catch (err) {
-      setError('Failed to load phrases');
-      console.error('Phrases fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
+    const list = Object.entries(phraseData).flatMap(
+      ([folder, files]) =>
+        files.map((name) => ({
+          _id: `${folder}-${name}`,
+          title: name,
+          category: folder,
+          videoUrl: `/assets/Phrases/${folder}/${name}.mp4`,
+        }))
+    );
+
+    setVideos(list);
   };
 
-  const filterPhrases = () => {
-    let filtered = phrases;
+  /* =========================
+     FILTER + SORT
+  ========================= */
+  const filterAndSort = () => {
+    let data = [...videos];
 
-    if (category !== 'all') {
-      filtered = filtered.filter(p => p.category === category);
+    if (category !== "all") {
+      data = data.filter((v) => v.category === category);
     }
 
     if (searchTerm) {
-      filtered = filtered.filter(p => 
-        p.phrase.toLowerCase().includes(searchTerm.toLowerCase())
+      data = data.filter((v) =>
+        v.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    setFilteredPhrases(filtered);
-  };
+    data.sort((a, b) =>
+      sortOrder === "asc"
+        ? a.title.localeCompare(b.title)
+        : b.title.localeCompare(a.title)
+    );
 
-  const categories = [
-    { value: 'all', label: 'All Categories', icon: '📚' },
-    { value: 'greeting', label: 'Greetings', icon: '👋' },
-    { value: 'polite', label: 'Polite Expressions', icon: '🙏' },
-    { value: 'daily', label: 'Daily Life', icon: '🏠' },
-    { value: 'question', label: 'Questions', icon: '❓' },
-    { value: 'emotion', label: 'Emotions', icon: '😊' },
-    { value: 'emergency', label: 'Emergency', icon: '🚨' }
-  ];
+    setFilteredVideos(data);
+  };
+  useEffect(() => {
+    loadPhraseVideos();
+  }, []);
+
+  useEffect(() => {
+    filterAndSort();
+  }, [videos, category, searchTerm, sortOrder]);
 
   return (
-    <div className="phrases-container">
+    <div className="learn-container">
+      {/* HEADER */}
       <motion.div
         className="page-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1><FaBook /> Common ISL Phrases & Sentences</h1>
-        <p>Learn everyday phrases and sentences in Indian Sign Language</p>
+        <h1>
+          <FaBook /> ISL Phrase Videos
+        </h1>
+        <p>Learn phrases using sign language videos</p>
       </motion.div>
 
-      {error && (
-        <div className="error-message">{error}</div>
-      )}
-
       <div className="card">
-        <div className="phrases-controls">
+        {/* CONTROLS */}
+        <div className="learn-controls">
           <div className="search-box">
             <FaSearch />
             <input
@@ -88,56 +117,70 @@ function Phrases() {
             />
           </div>
 
-          <div className="category-filters-grid">
-            {categories.map((cat) => (
+          <div className="category-filters">
+            {[
+              "all",
+              "Daily Life",
+              "Emergency",
+              "Emotions",
+              "Greetings",
+              "Polite Expressions",
+              "Questions",
+            ].map((c) => (
               <button
-                key={cat.value}
-                className={`category-btn-modern ${category === cat.value ? 'active' : ''}`}
-                onClick={() => setCategory(cat.value)}
+                key={c}
+                className={`category-btn ${
+                  category === c ? "active" : ""
+                }`}
+                onClick={() => setCategory(c)}
               >
-                <span className="cat-icon">{cat.icon}</span>
-                <span className="cat-label">{cat.label}</span>
+                {c}
               </button>
             ))}
+
+            <button
+              className="category-btn sort-btn"
+              onClick={() =>
+                setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+              }
+            >
+              {sortOrder === "asc" ? (
+                <FaSortAmountUp />
+              ) : (
+                <FaSortAmountDown />
+              )}
+            </button>
           </div>
         </div>
 
-        {loading ? (
-          <div className="loading">
-            <div className="spinner"></div>
-            <p>Loading phrases...</p>
-          </div>
-        ) : filteredPhrases.length === 0 ? (
-          <div className="empty-state">
-            <FaBook />
-            <p>No phrases found</p>
-            <span>Try adjusting your search or filters</span>
-          </div>
+        {/* GRID */}
+        {filteredVideos.length === 0 ? (
+          <p className="empty-state">
+            No results found for "{searchTerm}"
+          </p>
         ) : (
-          <div className="phrases-grid">
-            {filteredPhrases.map((phrase, index) => (
+          <div className="gestures-grid">
+            {filteredVideos.map((video, index) => (
               <motion.div
-                key={phrase._id}
-                className="phrase-card"
-                initial={{ opacity: 0, scale: 0.95 }}
+                key={video._id}
+                className="gesture-card"
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => setSelectedPhrase(phrase)}
+                transition={{ delay: index * 0.02 }}
+                onClick={() => setSelectedVideo(video)}
               >
-                <div className="phrase-header">
-                  <h3>{phrase.phrase}</h3>
-                  <span className={`category-badge cat-${phrase.category}`}>
-                    {phrase.category}
-                  </span>
-                </div>
-                <p className="phrase-explanation">{phrase.explanation}</p>
-                <div className="phrase-meta">
-                  <span className={`difficulty-badge difficulty-${phrase.difficulty}`}>
-                    {phrase.difficulty}
-                  </span>
-                  <span className="signs-count">
-                    {phrase.signs.length} {phrase.signs.length === 1 ? 'sign' : 'signs'}
-                  </span>
+                <video
+                  src={video.videoUrl}
+                  muted
+                  loop
+                  className="gesture-video"
+                  onMouseEnter={(e) => e.target.play()}
+                  onMouseLeave={(e) => e.target.pause()}
+                />
+
+                <div className="gesture-card-info">
+                  <h3>{video.title}</h3>
+                  <span className="category-badge">{video.category}</span>
                 </div>
               </motion.div>
             ))}
@@ -145,101 +188,47 @@ function Phrases() {
         )}
       </div>
 
-      {selectedPhrase && (
-        <motion.div
-          className="phrase-modal-overlay"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          onClick={() => setSelectedPhrase(null)}
-        >
+      {/* MODAL */}
+      <AnimatePresence>
+        {selectedVideo && (
           <motion.div
-            className="phrase-modal"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            onClick={(e) => e.stopPropagation()}
+            className="gesture-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedVideo(null)}
           >
-            <button 
-              className="modal-close"
-              onClick={() => setSelectedPhrase(null)}
+            <motion.div
+              className="gesture-modal"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.8 }}
+              onClick={(e) => e.stopPropagation()}
             >
-              ×
-            </button>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedVideo(null)}
+              >
+                ×
+              </button>
 
-            <div className="modal-header-phrase">
-              <h2>{selectedPhrase.phrase}</h2>
-              <span className={`category-badge cat-${selectedPhrase.category}`}>
-                {selectedPhrase.category}
+              <video
+                src={selectedVideo.videoUrl}
+                controls
+                autoPlay
+                className="modal-video"
+              />
+
+              <h2>{selectedVideo.title}</h2>
+              <span className="category-badge">
+                {selectedVideo.category}
               </span>
-            </div>
-
-            <div className="modal-body-phrase">
-              <div className="info-section-phrase">
-                <FaInfoCircle className="section-icon" />
-                <div>
-                  <h3>Explanation</h3>
-                  <p>{selectedPhrase.explanation}</p>
-                </div>
-              </div>
-
-              <div className="info-section-phrase">
-                <FaLightbulb className="section-icon" />
-                <div>
-                  <h3>When to Use</h3>
-                  <p>{selectedPhrase.usage}</p>
-                </div>
-              </div>
-
-              <div className="signs-breakdown">
-                <h3>Signs Breakdown</h3>
-                <div className="signs-list">
-                  {selectedPhrase.signs.map((sign, index) => (
-                    <div key={index} className="sign-item-breakdown">
-                      <div className="sign-number">{index + 1}</div>
-                      <div className="sign-details">
-                        <h4>{sign.word}</h4>
-                        <p>{sign.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="phrase-difficulty-info">
-                <span className={`difficulty-badge difficulty-${selectedPhrase.difficulty}`}>
-                  Difficulty: {selectedPhrase.difficulty}
-                </span>
-              </div>
-            </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-
-      <div className="card info-card-phrases">
-        <h2>Tips for Learning Phrases</h2>
-        <div className="tips-grid-phrases">
-          <div className="tip-box">
-            <h3>🎭 Facial Expressions</h3>
-            <p>Your face is as important as your hands. Use appropriate expressions for each phrase.</p>
-          </div>
-          <div className="tip-box">
-            <h3>⏱️ Timing & Flow</h3>
-            <p>Maintain natural rhythm. Don't rush through signs; smooth transitions are key.</p>
-          </div>
-          <div className="tip-box">
-            <h3>👀 Eye Contact</h3>
-            <p>Maintain eye contact when signing, especially for questions and expressions of emotion.</p>
-          </div>
-          <div className="tip-box">
-            <h3>📖 Context Matters</h3>
-            <p>The same sign can mean different things based on context and facial expressions.</p>
-          </div>
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 export default Phrases;
-
-
-
