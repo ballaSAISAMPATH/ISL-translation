@@ -7,7 +7,6 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Translation from './pages/Translation';
 import Learning from './pages/Learning';
-import ISLToText from './pages/ISLToText';
 import TextToISL from './pages/TextToISL';
 import History from './pages/History';
 import Learn from './pages/Learn';
@@ -43,10 +42,9 @@ function AppContent() {
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/translation" element={<ProtectedRoute><Translation /></ProtectedRoute>} />
           <Route path="/train" element={<ProtectedRoute><ISLTrainer /></ProtectedRoute>} />
-          <Route path="/predict" element={<ProtectedRoute><ISLPredictor /></ProtectedRoute>} />
-          <Route path="/learning" element={<ProtectedRoute><Learning /></ProtectedRoute>} />
-          <Route path="/isl-to-text" element={<ProtectedRoute><ISLToText /></ProtectedRoute>} />
+          <Route path="/isl-to-text" element={<ProtectedRoute><ISLPredictor /></ProtectedRoute>} />
           <Route path="/text-to-isl" element={<ProtectedRoute><TextToISL /></ProtectedRoute>} />
+          <Route path="/learning" element={<ProtectedRoute><Learning /></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
           <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
           <Route path="/tutorial" element={<ProtectedRoute><Tutorial /></ProtectedRoute>} />
