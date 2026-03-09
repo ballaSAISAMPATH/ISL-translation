@@ -29,7 +29,7 @@ function Register() {
       return;
     }
 
-    setLoading(true);
+    setLoading(false);
     const result = await register(name, email, password);
     
     if (result.success) {
