@@ -18,18 +18,17 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 
 // Context
-import { AuthProvider, useAuth } from './context/AuthContext';
+import {  useAuth } from './context/AuthContext';
 import ISLTrainer from './pages/ISLTrainer';
 import ISLPredictor from './pages/ISLPredictor';
 import Chatbot from './pages/Chatbot';
 
 function ProtectedRoute({ children }) {
-  const { user } = useAuth();
-  return user ? children : <Navigate to="/login" />;
+  
 }
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user } = "";
 
   return (
     <div className="App">
@@ -60,9 +59,7 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
       <AppContent />
-    </AuthProvider>
   );
 }
 
