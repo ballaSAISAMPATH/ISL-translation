@@ -24,11 +24,12 @@ import ISLPredictor from './pages/ISLPredictor';
 import Chatbot from './pages/Chatbot';
 
 function ProtectedRoute({ children }) {
-  
+  const { user } = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : { user: null };
+  return user ? children : <Navigate to="/login" />;
 }
 
 function AppContent() {
-  const { user } = "";
+  const { user } = useAuth();
 
   return (
     <div className="App">
