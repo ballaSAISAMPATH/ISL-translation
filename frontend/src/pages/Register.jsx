@@ -16,30 +16,32 @@ function Register() {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+  setError('');
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
+  if(password !== confirmPassword){
+    setError("Passwords do not match");
+    return;
+  }
 
-    setLoading(false);
-    const result = await register(name, email, password);
-    
-    if (result.success) {
-      navigate('/');
-    } else {
-      setError(result.error);
-    }
-    
-    setLoading(false);
-  };
+  if(password.length < 6){
+    setError("Password must be at least 6 characters");
+    return;
+  }
+
+  setLoading(true);
+
+  const result = await register(name,email,password);
+
+  if(result.success){
+    navigate('/login');
+  }else{
+    setError(result.error);
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="auth-container">
