@@ -36,5 +36,6 @@ export const login = async (req,res)=>{
 
 export const verify = async (req,res)=>{
       const decoded =jwt.verify(req.body.token,process.env.JWT_SECRET);
-
+      console.log(decoded);
+      
 }
