@@ -3,6 +3,7 @@ import Webcam from "react-webcam";
 import axios from "axios";
 import { Hands } from "@mediapipe/hands";
 import { FaVideoSlash, FaPlay, FaStop, FaCamera, FaVolumeUp, FaTrashAlt } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const FRAME_INTERVAL_MS = 200; 
 
@@ -17,7 +18,7 @@ function ISLPredictor() {
   const [prediction, setPrediction] = useState("");
   const [confidence, setConfidence] = useState(0);
   const [status, setStatus] = useState("Idle");
-  
+  const user_id = useSelector((state)=>state.counter.user_id)
   // Sentence State
   const [sentence, setSentence] = useState("");
   const [lastAddedWord, setLastAddedWord] = useState("");
@@ -42,9 +43,14 @@ function ISLPredictor() {
       setStatus("Predicting...");
 
       // Logical Word Addition: Only add if confidence > 90% and it's not the same as the last word
-      if (currentConf > 0.90 && currentWord !== lastAddedWord) {
+      if (currentConf > 0.80 && currentWord !== lastAddedWord) {
         setSentence((prev) => prev + (prev ? " " : "") + currentWord);
         setLastAddedWord(currentWord);
+        const response =  await axios.post("http://localhost:4000/database/isl-to-text",{
+          user_id:user_id,
+          phrase:currentWord
+        })        
+        console.log(response.data);
       }
     } catch (err) {
       console.error(err);

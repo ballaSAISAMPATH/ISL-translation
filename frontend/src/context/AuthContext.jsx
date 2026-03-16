@@ -42,6 +42,8 @@ export function useAuth() {
       // store token
       localStorage.setItem("token",data.token);
       localStorage.setItem("email",data.email);
+      localStorage.setItem("name",data.name);
+      localStorage.setItem("user_id",data.user_id);
       dispatch(setUserDetails(
         {name:data.name,
         email:data.email,
@@ -54,7 +56,10 @@ export function useAuth() {
     }
   }
   async function logout(){
-    localStorage.setItem("token",'')
+    localStorage.removeItem("token")
+    localStorage.removeItem("email")
+    localStorage.removeItem("name")
+    localStorage.removeItem("user_id")
     dispatch(setUserDetails(
         {name:'',
         email:'',
