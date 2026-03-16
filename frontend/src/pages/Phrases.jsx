@@ -179,7 +179,7 @@ function Phrases() {
                 />
 
                 <div className="gesture-card-info">
-                  <h3>{video.title}</h3>
+                  <h4 className=" my-2">{video.title}</h4>
                   <span className="category-badge">{video.category}</span>
                 </div>
               </motion.div>
@@ -189,7 +189,7 @@ function Phrases() {
       </div>
 
       {/* MODAL */}
-      <AnimatePresence>
+      <AnimatePresence className="gesture-modal">
         {selectedVideo && (
           <motion.div
             className="gesture-modal-overlay"
@@ -199,7 +199,7 @@ function Phrases() {
             onClick={() => setSelectedVideo(null)}
           >
             <motion.div
-              className="gesture-modal"
+              className="gesture-modal max-h-[90vh overflow-hidden"
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
@@ -216,10 +216,10 @@ function Phrases() {
                 src={selectedVideo.videoUrl}
                 controls
                 autoPlay
-                className="modal-video"
+                className="w-full max-h-[70vh] object-contain"
               />
 
-              <h2>{selectedVideo.title}</h2>
+              <h2 className="m-2">{selectedVideo.title}</h2>
               <span className="category-badge">
                 {selectedVideo.category}
               </span>

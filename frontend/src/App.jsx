@@ -27,10 +27,10 @@ import { useSelector } from 'react-redux';
  function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [valid, setValid] = useState(false);
-  const email = useSelector((state)=>state.counter.user_email)
   useEffect(() => {
     const verify = async () => {
       try {
+        const email = localStorage.getItem("email");
         const token = localStorage.getItem("token");
         const res = await axios.post("http://localhost:4000/auth/verify", { token,email, });      
         console.log(res.data);

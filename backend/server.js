@@ -18,3 +18,4 @@ app.listen(PORT,()=>{
 })
 
 app.use('/auth',authRouter)
+app.use('/database',databaseRouter)

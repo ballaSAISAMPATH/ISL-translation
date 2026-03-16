@@ -164,7 +164,7 @@ function TextToISL() {
                   loop={true}
                   controlsList="nodownload"
                   onContextMenu={(e) => e.preventDefault()}
-                  className="w-full rounded-2xl shadow-xl"
+                  className="w-full h-150 rounded-xl shadow-xl"
                 />
               )}
             </div>
