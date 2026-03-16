@@ -3,9 +3,9 @@ import { createSlice } from '@reduxjs/toolkit'
 export const counterSlice = createSlice({
   name: 'counter',
   initialState: {
-    user_email:'none',
-    user_id:'',
-    user_name:'',
+    user_email:localStorage.getItem("email") || '',
+    user_id:localStorage.getItem("user_id") || '',
+    user_name:localStorage.getItem("name") || '',
     
   },
   reducers: {

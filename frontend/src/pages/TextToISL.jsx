@@ -1,11 +1,14 @@
+import axios from "axios";
 import React, { useState, useMemo } from "react";
 import { FaSearch, FaVideo } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 function TextToISL() {
   const [inputText, setInputText] = useState("");
   const [selectedPhrase, setSelectedPhrase] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const user_id = useSelector((state)=>state.counter.user_id)
   const [searching, setSearching] = useState(false);
   const phraseVideos = [
     { text: "Hungry", category: "Daily Life" },
@@ -77,9 +80,14 @@ function TextToISL() {
                 {suggestions.map((s) => (
                   <button
                     key={s.text}
-                    onClick={() => {
+                    onClick={async () => {
                       setSearching(false)
                       setInputText(s.text);
+                      const response = await axios.post("http://localhost:4000/database/text-to-isl",{
+                        user_id:user_id,
+                        phrase:s.text
+                      })
+                      console.log(response.data);
                       setSelectedPhrase(s);
                       setShowVideo(false);
                       setNotFound(false);
