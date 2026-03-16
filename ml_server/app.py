@@ -27,12 +27,12 @@ model = joblib.load(MODEL_PATH)
 
 # System prompt (static)
 SYSTEM_MESSAGE = SystemMessage(
-    content="You are a helpful assistant that translates sign language gestures into text. Respond concisely and accurately."
+    content="You are a helpful assistant, answer all questions politely"
 )
 
 # Groq LLM
 chatModel = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="llama-3.3-70b-versatile",
     api_key=os.getenv("LANGCHAIN_API_KEY")
 )
 
@@ -47,22 +47,21 @@ def health():
 
 
 # ---------- CHATBOT ----------
+messages = [
+    SYSTEM_MESSAGE,
+]
 @app.route("/chatbot", methods=["POST"])
 def chatbot():
     data = request.get_json()
     query = data.get("query")
-
+    messages.append(HumanMessage(content=query))
     if not query:
         return jsonify({"error": "Query missing"}), 400
 
     # NEW chat per request (no shared memory bug)
-    messages = [
-        SYSTEM_MESSAGE,
-        HumanMessage(content=query)
-    ]
 
     response = chatModel.invoke(messages)
-
+    messages.append(AIMessage(content=response.content))
     return jsonify({
         "reply": response.content
     })
