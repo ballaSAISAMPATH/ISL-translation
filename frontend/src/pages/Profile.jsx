@@ -131,6 +131,9 @@ function Profile() {
         <div className="card preferences-card">
           <h2><FaCog /> Preferences</h2>
 
+             <div className='text-red-600 m-0'>
+                 section will be available in future updates!
+              </div>
           <div className="preference-group">
             <label>Theme</label>
             <div className="theme-options">
@@ -140,13 +143,15 @@ function Profile() {
               >
                 ☀️ Light
               </button>
-              <button
+              <button disabled 
+                
                 className={`theme-btn ${preferences.theme === 'dark' ? 'active' : ''}`}
                 onClick={() => handlePreferenceChange('theme', 'dark')}
               >
                 🌙 Dark
               </button>
             </div>
+             
           </div>
 
           <div className="preference-group">

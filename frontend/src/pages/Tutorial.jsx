@@ -150,10 +150,10 @@ function Tutorial() {
         animate={{ opacity: 1, y: 0 }}
       >
         <h1><FaBook /> ISL Learning Tutorial</h1>
-        <p>Step-by-step guide to master Indian Sign Language</p>
+        {/* <p>Step-by-step guide to master Indian Sign Language</p> */}
       </motion.div>
 
-      <div className="progress-section card">
+      {/* <div className="progress-section card">
         <div className="progress-header">
           <h3>Your Progress</h3>
           <span className="progress-text">{completedLessons.length}/{lessons.length} Lessons Completed</span>
@@ -166,7 +166,7 @@ function Tutorial() {
             transition={{ duration: 0.5 }}
           />
         </div>
-      </div>
+      </div> */}
 
       <div className="tutorial-layout">
         <div className="lessons-sidebar card">
@@ -257,7 +257,7 @@ function Tutorial() {
             </div>
           </motion.div>
 
-          <div className="card practice-section">
+          {/* <div className="card practice-section">
             <h3><FaVideo /> Practice Exercises</h3>
             <div className="exercises-grid">
               {practiceExercises.map((exercise, index) => (
@@ -281,7 +281,7 @@ function Tutorial() {
                 </motion.div>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
