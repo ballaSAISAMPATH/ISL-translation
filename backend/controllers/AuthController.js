@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 import mongoose, { mongo } from 'mongoose';
 import User from '../models/User.js';
 import bcrypt from 'bcrypt'
-mongoose.connect(process.env.MONGO_URI)
 dotenv.config();
 
+mongoose.connect(process.env.MONGO_URI)
 export const register = async (req,res)=>{
       console.log(req.body);
       const response = await User.findOne({email:req.body.email});
@@ -35,7 +35,21 @@ export const login = async (req,res)=>{
 }
 
 export const verify = async (req,res)=>{
-      const decoded =jwt.verify(req.body.token,process.env.JWT_SECRET);
-      console.log(decoded);
+      try{
+            
+            const decoded =jwt.verify(req.body.token,process.env.JWT_SECRET);
+            console.log(decoded);            
+            
+            if (req.body.email==decoded.email){
+                  return res.json({tokenExpired:false, userMatched: true})
+            }
+            else{
+                  return res.json({tokenExpired:false, userMatched: false})
+                  
+            }
+      }
+      catch(err){
+            return res.json({tokenExpired:true})
+      }
       
 }

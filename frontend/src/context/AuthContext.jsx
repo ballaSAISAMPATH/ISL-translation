@@ -1,7 +1,8 @@
 import axios from "axios"
-
+import {useSelector, useDispatch} from 'react-redux'
+import { setUserDetails } from "../../app/counterSlice";
 export function useAuth() {
-
+  const dispatch = useDispatch();
   async function register(name,email,password){
     try{
       const response = await axios.post(
@@ -28,7 +29,8 @@ export function useAuth() {
       );
 
       const data = response.data;
-
+      console.log(data);
+      
       if(!data.userExists){
         return {success:false,error:"User not found"};
       }
@@ -39,23 +41,29 @@ export function useAuth() {
 
       // store token
       localStorage.setItem("token",data.token);
-      localStorage.setItem("user",JSON.stringify({
-        name:data.name,
+      // localStorage.setItem("user",JSON.stringify({
+      //   name:data.name,
+      //   email:data.email,
+      //   user_id:data.user_id
+      // }));
+      dispatch(setUserDetails(
+        {name:data.name,
         email:data.email,
-        user_id:data.user_id
-      }));
-
-      return {
-        success:true,
-        token:data.token,
-        name:data.name,
-        email:data.email
-      };
-
+        user_id:data.user_id}
+    ))
+      return {success:true}
     }catch(err){
+      console.log(err);
       return {success:false,error:"Server error"};
     }
   }
-
-  return {register,login};
+  async function logout(){
+    localStorage.setItem("token",'')
+    dispatch(setUserDetails(
+        {name:'',
+        email:'',
+        user_id:'',}
+    ))
+  }
+  return {register,login,logout};
 }

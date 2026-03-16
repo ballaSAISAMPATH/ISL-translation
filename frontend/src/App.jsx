@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
@@ -18,27 +18,49 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 
 // Context
-import {  useAuth } from './context/AuthContext';
 import ISLTrainer from './pages/ISLTrainer';
 import ISLPredictor from './pages/ISLPredictor';
 import Chatbot from './pages/Chatbot';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
-function ProtectedRoute({ children }) {
-  const { user } = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : { user: null };
-  return user ? children : <Navigate to="/login" />;
+ function ProtectedRoute({ children }) {
+  const [loading, setLoading] = useState(true);
+  const [valid, setValid] = useState(false);
+  const email = useSelector((state)=>state.counter.user_email)
+  useEffect(() => {
+    const verify = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.post("http://localhost:4000/auth/verify", { token,email, });      
+        console.log(res.data);
+          
+        if (!res.data.tokenExpired) {
+          if(res.data.userMatched) setValid(true);
+        }           
+      } catch (err) {
+        setValid(false);
+      }
+      setLoading(false);
+    };
+
+    verify();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
+  return valid ? children : <Navigate to="/login" />;
 }
 
 function AppContent() {
-  const { user } = useAuth();
 
   return (
     <div className="App">
       <Router>
-        {user && <Navbar />}
+        {<Navbar />}
         <Routes>
-          <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
-          <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
-          
+          <Route path="/login" element={ <Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/translation" element={<ProtectedRoute><Translation /></ProtectedRoute>} />
           <Route path="/train" element={<ProtectedRoute><ISLTrainer /></ProtectedRoute>} />
