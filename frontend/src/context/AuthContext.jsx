@@ -41,11 +41,7 @@ export function useAuth() {
 
       // store token
       localStorage.setItem("token",data.token);
-      // localStorage.setItem("user",JSON.stringify({
-      //   name:data.name,
-      //   email:data.email,
-      //   user_id:data.user_id
-      // }));
+      localStorage.setItem("email",data.email);
       dispatch(setUserDetails(
         {name:data.name,
         email:data.email,

@@ -30,7 +30,7 @@ export const login = async (req,res)=>{
       if(!result){
             return res.json({userExists:true,password_matched:false});
       }
-      const token =jwt.sign({email:req.body.email},process.env.JWT_SECRET,{expiresIn:'1h'});
+      const token =jwt.sign({email:req.body.email},process.env.JWT_SECRET,{expiresIn:'1w'});
       return res.json({userExists:true,password_matched:true,token,name:user.name,email:user.email,user_id:user._id});
 }
 
