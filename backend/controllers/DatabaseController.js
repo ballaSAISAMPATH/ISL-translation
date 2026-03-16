@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import History from "../models/History.js";
 import dotenv from 'dotenv';
+import User from "../models/User.js";
 dotenv.config();
 mongoose.connect(process.env.MONGO_URI)
 
@@ -40,6 +41,17 @@ export const get_history = async (req,res)=>{
       try{
             const response = await History.find({user_id:req.body.user_id}).sort({time:-1});
             res.json({success:true,history:response});
+      }
+      catch(err){
+            res.json({success:false,error:"Server error"});
+      }
+}
+
+export const get_user_history = async (req,res)=>{
+      try{
+            const response = await User.findOne({_id:req.body.user_id});
+            const user = {name:response.name,email:response.email,user_id:response._id,created_at:response.created_at}
+            res.json({success:true,user:user});
       }
       catch(err){
             res.json({success:false,error:"Server error"});

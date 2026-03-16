@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
 import { FaUser, FaEnvelope, FaCog, FaSave } from 'react-icons/fa';
 import './Profile.css';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+
 
 function Profile() {
   const { user, updatePreferences } = useAuth();
@@ -14,7 +17,19 @@ function Profile() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
-
+  const [userDetails,setUserDetails] = useState(null);
+  const user_id= useSelector((state)=>state.counter.user_id);
+  
+  useEffect(()=>{
+    const fetchUserDetails = async () => {
+      const response = await axios.post("http://localhost:4000/database/get-user-details", {user_id:user_id})
+      console.log(response.data);
+      if(response.data.success){
+        setUserDetails(response.data.user);
+      }
+    }
+    fetchUserDetails();
+  },[])
   const handlePreferenceChange = (key, value) => {
     setPreferences(prev => ({
       ...prev,
@@ -47,7 +62,6 @@ function Profile() {
         animate={{ opacity: 1, y: 0 }}
       >
         <h1><FaUser /> User Profile</h1>
-        <p>Manage your account settings and preferences</p>
       </motion.div>
 
       {message && (
@@ -76,31 +90,40 @@ function Profile() {
           
           <div className="profile-field">
             <label><FaUser /> Name</label>
-            <div className="profile-value">{user?.name}</div>
+            <div className="profile-value">{userDetails?.name}</div>
           </div>
 
           <div className="profile-field">
             <label><FaEnvelope /> Email</label>
-            <div className="profile-value">{user?.email}</div>
+            <div className="profile-value">{userDetails?.email}</div>
           </div>
 
           <div className="profile-field">
-            <label>Account Type</label>
+            <label>Account ID</label>
             <div className="profile-value">
-              <span className="role-badge">{user?.role || 'User'}</span>
+              <span className="role-badge">{userDetails?.user_id}</span>
             </div>
           </div>
 
           <div className="profile-field">
             <label>Member Since</label>
             <div className="profile-value">
-              {user?.createdAt 
-                ? new Date(user.createdAt).toLocaleDateString('en-US', {
+              {userDetails?.created_at
+                ? new Date(userDetails?.created_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
-                    day: 'numeric'
+                    day: 'numeric',
+                    
                   })
                 : 'N/A'}
+                ,<div></div>   
+                {userDetails?.created_at
+                ? new Date(userDetails.created_at).toLocaleString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                  })
+                : "N/A"}
             </div>
           </div>
         </div>
@@ -171,7 +194,7 @@ function Profile() {
         </div>
       </div>
 
-      <div className="card stats-card">
+      {/* <div className="card stats-card">
         <h2>Your Activity</h2>
         <div className="activity-stats">
           <div className="activity-stat">
@@ -194,7 +217,7 @@ function Profile() {
         <p className="text-muted text-center mt-3">
           Keep practicing to improve your ISL skills!
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }
